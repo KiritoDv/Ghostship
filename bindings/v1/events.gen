@@ -1,0 +1,27 @@
+lua.new_usertype<GameFrameUpdate>("GameFrameUpdate");
+
+lua.new_usertype<RenderPauseCourseOptions>("RenderPauseCourseOptions",
+    "render", sol::property(&RenderPauseCourseOptions::render, &RenderPauseCourseOptions::render)
+);
+
+lua.new_usertype<LevelScriptBeginArea>("LevelScriptBeginArea",
+    "areaIndex", sol::property(&LevelScriptBeginArea::areaIndex, &LevelScriptBeginArea::areaIndex),
+    "geoLayoutAddr", sol::property(&LevelScriptBeginArea::geoLayoutAddr, &LevelScriptBeginArea::geoLayoutAddr)
+);
+
+lua.new_usertype<GeoLayoutCallASM>("GeoLayoutCallASM",
+    "func", sol::property(&GeoLayoutCallASM::func, &GeoLayoutCallASM::func),
+    "parameter", sol::property(&GeoLayoutCallASM::parameter, &GeoLayoutCallASM::parameter)
+);
+
+lua.new_usertype<LevelInitFromSaveFile>("LevelInitFromSaveFile");
+
+lua.new_usertype<PlayerHealthChange>("PlayerHealthChange",
+    "m", sol::property(&PlayerHealthChange::m, &PlayerHealthChange::m),
+    "health", sol::property(&PlayerHealthChange::health, &PlayerHealthChange::health)
+);
+
+lua.new_usertype<PlayerLivesChange>("PlayerLivesChange",
+    "m", sol::property(&PlayerLivesChange::m, &PlayerLivesChange::m),
+    "lives", sol::property(&PlayerLivesChange::lives, &PlayerLivesChange::lives)
+);

@@ -1,4 +1,6 @@
 #include "GhostshipMenu.h"
+#include "port/Engine.h"
+#include "port/scripting/scripting.h"
 #include "port/mods/BetterLevelSelect.h"
 
 namespace GhostshipGui {
@@ -96,6 +98,28 @@ void GhostshipMenu::AddMenuDevTools() {
         .WindowName("Save Editor")
         .HideInSearch(true)
         .Options(WindowButtonOptions().Tooltip("Enables the separate Save Editor Window."));
+    
+    path.sidebarName = "Asset Manager";
+    AddSidebarEntry("Dev Tools", path.sidebarName, 2);
+    AddWidget(path, "Reload All Resources", WIDGET_BUTTON)
+        .Options(ButtonOptions().Tooltip("Reloads all resources from disk.").Color(Colors::Orange))
+        .Callback([](WidgetInfo& info) { GameEngine_ReloadAllResources(); });
+    AddWidget(path, "Reload Scripts", WIDGET_BUTTON)
+        .Options(ButtonOptions().Tooltip("Reloads all scripts from disk.").Color(Colors::Orange))
+        .Callback([](WidgetInfo& info) { 
+            ScriptingLayer::Instance->Reload();
+            GameEngine::LoadManifest();
+        });
+    
+    path.sidebarName = "Experiments";
+    AddSidebarEntry("Dev Tools", path.sidebarName, 2);
+
+    AddWidget(path, "Mario Star Overals", WIDGET_CVAR_CHECKBOX)
+        .CVar("gExperiment.MarioStarOveralls")
+        .Options(CheckboxOptions().Tooltip("Enables Mario's star overalls."))
+        .Callback([](WidgetInfo& info) {
+            GameEngine_ReloadAllResources();
+        });
 }
 
 } // namespace GhostshipGui

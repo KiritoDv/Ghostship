@@ -1,6 +1,6 @@
-#pragma once
-
+#ifndef __LUA__
 #include "port/hooks/impl/EventSystem.h"
+#endif
 
 DEFINE_EVENT(PlayerHealthChange,
     struct MarioState* m;

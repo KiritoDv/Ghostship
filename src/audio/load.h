@@ -45,7 +45,7 @@ extern s32 gMaxSimultaneousNotes;
 extern s32 gSamplesPerFrameTarget;
 extern s32 gMinAiBufferLength;
 extern s16 gTempoInternalToExternal;
-extern s8 gAudioUpdatesPerFrame; // = 4
+extern s8 gAudioUpdatesPerFrame; // = 4 // sol:ignore
 extern s8 gSoundMode;
 
 #ifdef VERSION_SH

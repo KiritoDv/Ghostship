@@ -1,44 +1,33 @@
 #pragma once
 
+#include "port/scripting/scripting.h"
 #include <stdint.h>
-#include <stdbool.h>
-#include <stddef.h>
 
-typedef uint32_t EventID;
+typedef int32_t EventID;
 typedef uint32_t ListenerID;
 
-typedef enum {
+typedef enum EventPriority {
     EVENT_PRIORITY_LOW,
     EVENT_PRIORITY_NORMAL,
     EVENT_PRIORITY_HIGH,
 } EventPriority;
 
-typedef struct {
+typedef struct IEvent {
     bool cancelled;
 } IEvent;
 
 typedef void (*EventCallback)(IEvent*);
 
-typedef struct {
-    EventPriority priority;
-    EventCallback function;
-} EventListener;
-
-#ifndef __cplusplus
 #ifdef INIT_EVENT_IDS
 #define DECLARE_EVENT(eventName) \
-    uint32_t eventName##ID = -1;
+    EventID eventName##ID = -1;
+#else
+#ifdef __cplusplus
+#define DECLARE_EVENT(eventName) \
+    extern "C" EventID eventName##ID;
 #else
 #define DECLARE_EVENT(eventName) \
-    extern uint32_t eventName##ID;
-#endif
-#else
-#ifdef INIT_EVENT_IDS
-#define DECLARE_EVENT(eventName) \
-    extern "C" uint32_t eventName##ID = -1;
-#else
-#define DECLARE_EVENT(eventName) \
-    extern "C" uint32_t eventName##ID;
+    extern EventID eventName##ID;
 #endif
 #endif
 
@@ -70,21 +59,31 @@ typedef struct {
     }
 
 #define REGISTER_EVENT(eventType) \
-    eventType##ID = EventSystem_RegisterEvent()
+    eventType##ID = EventSystem_RegisterEvent(); \
+    BindEvent(#eventType, eventType##ID);
 
 #define REGISTER_LISTENER(eventType, priority, callback) \
-    EventSystem_RegisterListener(eventType##ID, callback, priority)
+    EventSystem_RegisterListener(eventType##ID, callback, priority);
 
 #ifdef __cplusplus
 #include <array>
 #include <vector>
 #include <unordered_map>
+#include <sol/sol.hpp>
+
+typedef std::variant<EventCallback, sol::protected_function> SmartFunctionCallback;
+#define is_type(var, type) std::holds_alternative<type>((var))
+
+struct EventListener {
+    EventPriority priority;
+    SmartFunctionCallback function;
+};
 
 class EventSystem {
 public:
     static EventSystem* Instance;
     EventID RegisterEvent();
-    ListenerID RegisterListener(EventID id, EventCallback callback, EventPriority priority = EVENT_PRIORITY_NORMAL);
+    ListenerID RegisterListener(EventID id, const SmartFunctionCallback& callback, EventPriority priority = EVENT_PRIORITY_NORMAL);
     void UnregisterListener(EventID ev, ListenerID id);
     void CallEvent(EventID id, IEvent* event);
 private:
@@ -94,10 +93,12 @@ private:
 
 extern "C" {
 #endif
+
 extern EventID EventSystem_RegisterEvent();
 extern ListenerID EventSystem_RegisterListener(EventID id, EventCallback callback, EventPriority priority);
 extern void EventSystem_UnregisterListener(EventID ev, ListenerID id);
 extern void EventSystem_CallEvent(EventID id, void* event);
+
 #ifdef __cplusplus
 }
 #endif

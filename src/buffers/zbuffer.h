@@ -6,6 +6,6 @@
 #include "config.h"
 #include "macros.h"
 
-extern u16 gZBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
+extern u16 gZBuffer[SCREEN_WIDTH * SCREEN_HEIGHT]; // sol:ignore
 
 #endif // ZBUFFER_H

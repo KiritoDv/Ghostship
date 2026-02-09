@@ -49,6 +49,7 @@ class GameEngine {
     std::unordered_map<std::string, std::vector<uint8_t>>* dictionary;
 
     GameEngine();
+    static void LoadManifest();
     static void Create();
     static bool GenAssetFile(bool exitOnFail = true);
     void AudioInit();
@@ -118,6 +119,7 @@ bool GameEngine_OTRSigCheck(const char* imgData);
 struct Animation* GameEngine_LoadAnimation(uint32_t animId);
 void GameEngine_GfxPrint(const char* str, void* printer, void (*printImpl)(void*, char));
 void* GameEngine_GetExactDataByName(const char* path);
+void GameEngine_ReloadAllResources();
 
 #ifdef __cplusplus
 }

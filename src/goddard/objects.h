@@ -28,9 +28,9 @@ extern struct ObjGroup* sCurrentMoveGrp;
 extern struct GdVec3f D_801B9E18;
 extern struct GdVec3f D_801B9E28;
 extern f32 D_801B9E34;
-extern Mat4f* D_801B9E38;                /* never read from */
-extern struct ObjParticle *D_801B9E3C;  /* never read from */
-extern s32 D_801B9E40;                  /* always 0 */
+extern Mat4f* D_801B9E38;                /* never read from */ // sol:ignore
+extern struct ObjParticle *D_801B9E3C;  /* never read from */ // sol:ignore
+extern s32 D_801B9E40;                  /* always 0 */ // sol:ignore
 extern s32 D_801B9E44;
 extern Mat4f* D_801B9E48;
 extern struct ObjCamera* gGdCameraList;
@@ -40,7 +40,7 @@ extern s32 gGdObjCount;
 extern s32 gGdGroupCount;
 extern s32 gGdPlaneCount;
 extern s32 gGdCameraCount;
-extern struct Unk801B9E68 sGdViewInfo;   /* count in first member? */
+extern struct Unk801B9E68 sGdViewInfo;   /* count in first member? */ // sol:ignore
 extern void* D_801B9E80;
 extern struct ObjJoint* gGdJointList;
 extern struct ObjBone* gGdBoneList;

@@ -69,13 +69,13 @@ struct SynthesisReverb {
 #endif
 }; // 0xCC <= size <= 0x100
 #if defined(VERSION_EU) || defined(VERSION_SH)
-extern struct SynthesisReverb gSynthesisReverbs[4];
-extern s8 gNumSynthesisReverbs;
-extern struct NoteSubEu *gNoteSubsEu;
-extern f32 gLeftVolRampings[3][1024];
-extern f32 gRightVolRampings[3][1024];
-extern f32 *gCurrentLeftVolRamping; // Points to any of the three left buffers above
-extern f32 *gCurrentRightVolRamping; // Points to any of the three right buffers above
+extern struct SynthesisReverb gSynthesisReverbs[4]; // sol:ignore
+extern s8 gNumSynthesisReverbs; // sol:ignore
+extern struct NoteSubEu *gNoteSubsEu; // sol:ignore
+extern f32 gLeftVolRampings[3][1024]; // sol:ignore
+extern f32 gRightVolRampings[3][1024]; // sol:ignore
+extern f32 *gCurrentLeftVolRamping; // Points to any of the three left buffers above // sol:ignore
+extern f32 *gCurrentRightVolRamping; // Points to any of the three right buffers above // sol:ignore
 #else
 extern struct SynthesisReverb gSynthesisReverb;
 #endif

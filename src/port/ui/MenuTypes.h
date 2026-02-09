@@ -2,6 +2,7 @@
 
 #include <libultraship/libultraship.h>
 #include "UIWidgets.hpp"
+#include "game/debug.h"
 
 typedef enum {
     DISABLE_FOR_NO_VSYNC,
@@ -67,15 +68,6 @@ typedef enum {
     DEBUG_LOG_CRITICAL,
     DEBUG_LOG_OFF,
 } DebugLogOption;
-
-typedef enum {
-    DEBUG_PAGE_OBJECTINFO,       // 0: objectinfo
-    DEBUG_PAGE_CHECKSURFACEINFO, // 1: checkinfo/surfaceinfo
-    DEBUG_PAGE_MAPINFO,          // 2: mapinfo
-    DEBUG_PAGE_STAGEINFO,        // 3: stageinfo
-    DEBUG_PAGE_EFFECTINFO,       // 4: effectinfo
-    DEBUG_PAGE_ENEMYINFO         // 5: enemyinfo
-} DebugLogPage;
 
 // holds the widget values for a widget, contains all CVar types available from LUS. int32_t is used for boolean
 // evaluation

@@ -12,8 +12,12 @@ enum DebugPage {
     DEBUG_PAGE_ENEMYINFO         // 5: enemyinfo
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 s64 get_current_clock(void);
-s64 get_clock_difference(UNUSED s64 cycles);
+s64 get_clock_difference(s64 cycles);
 void set_text_array_x_y(s32 xOffset, s32 yOffset);
 void print_debug_top_down_objectinfo(const char *str, s32 number);
 void print_debug_top_down_mapinfo(const char * str, s32 number);
@@ -24,5 +28,9 @@ void stub_debug_5(void);
 void try_print_debug_mario_object_info(void);
 void try_do_mario_debug_object_spawn(void);
 void try_print_debug_mario_level_info(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // DEBUG_H

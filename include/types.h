@@ -125,20 +125,10 @@ struct GraphNodeObject {
     /*0x19*/ s8 activeAreaIndex;
     /*0x1A*/ Vec3s angle;
     /*0x20*/ Vec3f pos;
-    Vec3s prevAngle;
-    Vec3f prevPos;
-    u32 prevTimestamp;
-    Vec3f prevShadowPos;
-    u32 prevShadowPosTimestamp;
     /*0x2C*/ Vec3f scale;
-    Vec3f prevScale;
-    u32 prevScaleTimestamp;
     /*0x38*/ struct AnimInfo animInfo;
     /*0x4C*/ struct SpawnInfo *unk4C;
     /*0x50*/ Mat4 *throwMatrix; // matrix ptr
-    Mat4 prevThrowMatrix;
-    u32 prevThrowMatrixTimestamp;
-    Mat4 *throwMatrixInterpolated;
     /*0x54*/ Vec3f cameraToObject;
 };
 
@@ -166,6 +156,7 @@ struct Object {
         s32 asS32[0x50];
         s16 asS16[0x50][2];
         f32 asF32[0x50];
+// start-sol:ignore
 #if !IS_64_BIT
         s16 *asS16P[0x50];
         s32 *asS32P[0x50];
@@ -177,6 +168,7 @@ struct Object {
         void *asVoidPtr[0x50];
         const void *asConstVoidPtr[0x50];
 #endif
+// end-sol:ignore
     } rawData;
 #if IS_64_BIT
     union {

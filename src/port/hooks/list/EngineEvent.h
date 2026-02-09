@@ -1,9 +1,9 @@
-#pragma once
-
+#ifndef __LUA__
 #include "port/hooks/impl/EventSystem.h"
 #include "engine/graph_node.h"
 
 typedef s32 (*LevelScriptFunction)(s16, s32);
+#endif
 
 DEFINE_EVENT(GameFrameUpdate);
 

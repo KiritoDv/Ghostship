@@ -295,19 +295,42 @@ if (MSVC)
   endif()
 endif()
 
+#==================== SOL2 ======================
+FetchContent_Declare(
+    lua
+    GIT_REPOSITORY https://github.com/Net64DD/lua.git
+    GIT_TAG 846ebf927d9d6c404a00c88b28380ef2a47a69ad
+)
+
+FetchContent_MakeAvailable(lua)
+
+FetchContent_Declare(
+    sol2
+    GIT_REPOSITORY https://github.com/ThePhD/sol2.git
+	GIT_TAG c1f95a773c6f8f4fde8ca3efe872e7286afe4444
+)
+FetchContent_MakeAvailable(sol2)
+target_link_libraries(${PROJECT_NAME} PRIVATE lua::lua sol2)
+
+if (MSVC AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set_target_properties(liblua PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUNTIME_LIBRARY_STR})
+endif()
+
 #==============================================================================#
 # Libultraship Integration                                                     #
 #==============================================================================#
 find_package(SDL2)
 include_directories(${SDL2_INCLUDE_DIRS})
 
-add_subdirectory(libultraship ${CMAKE_CURRENT_SOURCE_DIR}/libultraship)
+add_subdirectory(libultraship ${CMAKE_BINARY_DIR}/libultraship)
 add_dependencies(${PROJECT_NAME} libultraship)
 target_link_libraries(${PROJECT_NAME} PRIVATE libultraship)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/libultraship/include
     ${CMAKE_CURRENT_SOURCE_DIR}/libultraship/include/libultraship
 )
+
+target_compile_options(ImGui PRIVATE -fno-objc-arc)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "iOS")
     get_property(IOS_TOOLCHAIN_FILE GLOBAL PROPERTY IOS_TOOLCHAIN_FILE)

@@ -477,6 +477,7 @@ extern "C" {
 
 #define C_BUTTONS     (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS   )
 
+// start-sol:ignore
 extern void osWritebackDCacheAll(void);
 extern s32 osPiStartDma(OSIoMesg *mb, s32 priority, s32 direction, uintptr_t devAddr, void *vAddr, size_t nbytes, OSMesgQueue *mq);
 extern void osCreatePiManager(OSPri pri, OSMesgQueue *cmdQ, OSMesg *cmdBuf, s32 cmdMsgCnt);
@@ -504,6 +505,7 @@ extern void osCreateViManager(OSPri);
 extern uintptr_t osVirtualToPhysical(void *addr);
 extern void * osPhysicalToVirtual(u32);
 extern void osMapTLB(int32_t a, uint32_t b, void* c, uint32_t d, uint32_t e, uint32_t f);
+// end-sol:ignore
 
 // LUS
 

@@ -1,0 +1,1377 @@
+lua.new_usertype<SpecialPreset>("SpecialPreset",
+    "preset_id", sol::property(&SpecialPreset::preset_id, &SpecialPreset::preset_id),
+    "type", sol::property(&SpecialPreset::type, &SpecialPreset::type),
+    "defParam", sol::property(&SpecialPreset::defParam, &SpecialPreset::defParam),
+    "model", sol::property(&SpecialPreset::model, &SpecialPreset::model),
+    "behavior", sol::property(&SpecialPreset::behavior, &SpecialPreset::behavior)
+);
+
+lua.new_usertype<MacroPreset>("MacroPreset",
+    "behavior", sol::property(&MacroPreset::behavior, &MacroPreset::behavior),
+    "model", sol::property(&MacroPreset::model, &MacroPreset::model),
+    "param", sol::property(&MacroPreset::param, &MacroPreset::param)
+);
+
+lua.new_usertype<Controller>("Controller",
+    "rawStickX", sol::property(&Controller::rawStickX, &Controller::rawStickX),
+    "rawStickY", sol::property(&Controller::rawStickY, &Controller::rawStickY),
+    "stickX", sol::property(&Controller::stickX, &Controller::stickX),
+    "stickY", sol::property(&Controller::stickY, &Controller::stickY),
+    "stickMag", sol::property(&Controller::stickMag, &Controller::stickMag),
+    "buttonDown", sol::property(&Controller::buttonDown, &Controller::buttonDown),
+    "buttonPressed", sol::property(&Controller::buttonPressed, &Controller::buttonPressed),
+    "statusData", sol::property(&Controller::statusData, &Controller::statusData),
+    "controllerData", sol::property(&Controller::controllerData, &Controller::controllerData),
+    "port", sol::property(&Controller::port, &Controller::port)
+);
+
+lua.new_usertype<SPTask>("SPTask",
+    "task", sol::property(&SPTask::task, &SPTask::task),
+    "msgqueue", sol::property(&SPTask::msgqueue, &SPTask::msgqueue),
+    "msg", sol::property(&SPTask::msg, &SPTask::msg),
+    "state", sol::property(&SPTask::state, &SPTask::state)
+);
+
+lua.new_usertype<VblankHandler>("VblankHandler",
+    "queue", sol::property(&VblankHandler::queue, &VblankHandler::queue),
+    "msg", sol::property(&VblankHandler::msg, &VblankHandler::msg)
+);
+
+lua.new_usertype<Animation>("Animation",
+    "flags", sol::property(&Animation::flags, &Animation::flags),
+    "animYTransDivisor", sol::property(&Animation::animYTransDivisor, &Animation::animYTransDivisor),
+    "startFrame", sol::property(&Animation::startFrame, &Animation::startFrame),
+    "loopStart", sol::property(&Animation::loopStart, &Animation::loopStart),
+    "loopEnd", sol::property(&Animation::loopEnd, &Animation::loopEnd),
+    "unusedBoneCount", sol::property(&Animation::unusedBoneCount, &Animation::unusedBoneCount),
+    "values", sol::property(&Animation::values, &Animation::values),
+    "index", sol::property(&Animation::index, &Animation::index),
+    "length", sol::property(&Animation::length, &Animation::length)
+);
+
+lua.new_usertype<GraphNode>("GraphNode",
+    "type", sol::property(&GraphNode::type, &GraphNode::type),
+    "flags", sol::property(&GraphNode::flags, &GraphNode::flags),
+    "prev", sol::property(&GraphNode::prev, &GraphNode::prev),
+    "next", sol::property(&GraphNode::next, &GraphNode::next),
+    "parent", sol::property(&GraphNode::parent, &GraphNode::parent),
+    "children", sol::property(&GraphNode::children, &GraphNode::children)
+);
+
+lua.new_usertype<AnimInfo>("AnimInfo",
+    "animID", sol::property(&AnimInfo::animID, &AnimInfo::animID),
+    "animYTrans", sol::property(&AnimInfo::animYTrans, &AnimInfo::animYTrans),
+    "curAnim", sol::property(&AnimInfo::curAnim, &AnimInfo::curAnim),
+    "animFrame", sol::property(&AnimInfo::animFrame, &AnimInfo::animFrame),
+    "animTimer", sol::property(&AnimInfo::animTimer, &AnimInfo::animTimer),
+    "animFrameAccelAssist", sol::property(&AnimInfo::animFrameAccelAssist, &AnimInfo::animFrameAccelAssist),
+    "animAccel", sol::property(&AnimInfo::animAccel, &AnimInfo::animAccel),
+    "prevAnimFrame", sol::property(&AnimInfo::prevAnimFrame, &AnimInfo::prevAnimFrame),
+    "prevAnimID", sol::property(&AnimInfo::prevAnimID, &AnimInfo::prevAnimID),
+    "prevAnimFrameTimestamp", sol::property(&AnimInfo::prevAnimFrameTimestamp, &AnimInfo::prevAnimFrameTimestamp),
+    "prevAnimPtr", sol::property(&AnimInfo::prevAnimPtr, &AnimInfo::prevAnimPtr)
+);
+
+lua.new_usertype<GraphNodeObject>("GraphNodeObject",
+    "node", sol::property(&GraphNodeObject::node, &GraphNodeObject::node),
+    "sharedChild", sol::property(&GraphNodeObject::sharedChild, &GraphNodeObject::sharedChild),
+    "areaIndex", sol::property(&GraphNodeObject::areaIndex, &GraphNodeObject::areaIndex),
+    "activeAreaIndex", sol::property(&GraphNodeObject::activeAreaIndex, &GraphNodeObject::activeAreaIndex),
+    "angle", sol::property(&GraphNodeObject::angle, &GraphNodeObject::angle),
+    "pos", sol::property(&GraphNodeObject::pos, &GraphNodeObject::pos),
+    "scale", sol::property(&GraphNodeObject::scale, &GraphNodeObject::scale),
+    "animInfo", sol::property(&GraphNodeObject::animInfo, &GraphNodeObject::animInfo),
+    "unk4C", sol::property(&GraphNodeObject::unk4C, &GraphNodeObject::unk4C),
+    "cameraToObject", sol::property(&GraphNodeObject::cameraToObject, &GraphNodeObject::cameraToObject)
+);
+
+lua.new_usertype<ObjectNode>("ObjectNode",
+    "gfx", sol::property(&ObjectNode::gfx, &ObjectNode::gfx),
+    "next", sol::property(&ObjectNode::next, &ObjectNode::next),
+    "prev", sol::property(&ObjectNode::prev, &ObjectNode::prev)
+);
+
+lua.new_usertype<Object>("Object",
+    "header", sol::property(&Object::header, &Object::header),
+    "parentObj", sol::property(&Object::parentObj, &Object::parentObj),
+    "prevObj", sol::property(&Obakeject::prevObj, &Object::prevObj),
+    "collidedObjInteractTypes", sol::property(&Object::collidedObjInteractTypes, &Object::collidedObjInteractTypes),
+    "activeFlags", sol::property(&Object::activeFlags, &Object::activeFlags),
+    "numCollidedObjs", sol::property(&Object::numCollidedObjs, &Object::numCollidedObjs),
+    "collidedObjs", sol::overload([] (Object& s, int i) -> struct Object* { return s.collidedObjs[i]; }, [] (Object& s, int i, struct Object* v) { s.collidedObjs[i] = v; }),
+    "asU32", sol::overload([] (Object& s, int i) -> u32 { return s.rawData.asU32[i]; }, [] (Object& s, int i, u32 v) { s.rawData.asU32[i] = v; }),
+    "asS32", sol::overload([] (Object& s, int i) -> s32 { return s.rawData.asS32[i]; }, [] (Object& s, int i, s32 v) { s.rawData.asS32[i] = v; }),
+    "asS16", sol::overload([] (Object& s, int i, int j) -> s16 { return s.rawData.asS16[i][j]; }, [] (Object& s, int i, int j, s16 v) { s.rawData.asS16[i][j] = v; }),
+    "asF32", sol::overload([] (Object& s, int i) -> f32 { return s.rawData.asF32[i]; }, [] (Object& s, int i, f32 v) { s.rawData.asF32[i] = v; }),
+    "asS16P", sol::overload([] (Object& s, int i) -> s16* { return s.ptrData.asS16P[i]; }, [] (Object& s, int i, s16* v) { s.ptrData.asS16P[i] = v; }),
+    "asS32P", sol::overload([] (Object& s, int i) -> s32* { return s.ptrData.asS32P[i]; }, [] (Object& s, int i, s32* v) { s.ptrData.asS32P[i] = v; }),
+    "asAnims", sol::overload([] (Object& s, int i) -> struct Animation** { return s.ptrData.asAnims[i]; }, [] (Object& s, int i, struct Animation** v) { s.ptrData.asAnims[i] = v; }),
+    "asWaypoint", sol::overload([] (Object& s, int i) -> struct Waypoint* { return s.ptrData.asWaypoint[i]; }, [] (Object& s, int i, struct Waypoint* v) { s.ptrData.asWaypoint[i] = v; }),
+    "asChainSegment", sol::overload([] (Object& s, int i) -> struct ChainSegment* { return s.ptrData.asChainSegment[i]; }, [] (Object& s, int i, struct ChainSegment* v) { s.ptrData.asChainSegment[i] = v; }),
+    "asObject", sol::overload([] (Object& s, int i) -> struct Object* { return s.ptrData.asObject[i]; }, [] (Object& s, int i, struct Object* v) { s.ptrData.asObject[i] = v; }),
+    "asSurface", sol::overload([] (Object& s, int i) -> struct Surface* { return s.ptrData.asSurface[i]; }, [] (Object& s, int i, struct Surface* v) { s.ptrData.asSurface[i] = v; }),
+    "unused1", sol::property(&Object::unused1, &Object::unused1),
+    "curBhvCommand", sol::property(&Object::curBhvCommand, &Object::curBhvCommand),
+    "bhvStackIndex", sol::property(&Object::bhvStackIndex, &Object::bhvStackIndex),
+    "bhvStack", sol::overload([] (Object& s, int i) -> uintptr_t { return s.bhvStack[i]; }, [] (Object& s, int i, uintptr_t v) { s.bhvStack[i] = v; }),
+    "bhvDelayTimer", sol::property(&Object::bhvDelayTimer, &Object::bhvDelayTimer),
+    "respawnInfoType", sol::property(&Object::respawnInfoType, &Object::respawnInfoType),
+    "hitboxRadius", sol::property(&Object::hitboxRadius, &Object::hitboxRadius),
+    "hitboxHeight", sol::property(&Object::hitboxHeight, &Object::hitboxHeight),
+    "hurtboxRadius", sol::property(&Object::hurtboxRadius, &Object::hurtboxRadius),
+    "hurtboxHeight", sol::property(&Object::hurtboxHeight, &Object::hurtboxHeight),
+    "hitboxDownOffset", sol::property(&Object::hitboxDownOffset, &Object::hitboxDownOffset),
+    "behavior", sol::property(&Object::behavior, &Object::behavior),
+    "unused2", sol::property(&Object::unused2, &Object::unused2),
+    "platform", sol::property(&Object::platform, &Object::platform),
+    "collisionData", sol::property(&Object::collisionData, &Object::collisionData),
+    "respawnInfo", sol::property(&Object::respawnInfo, &Object::respawnInfo)
+);
+
+lua.new_usertype<ObjectHitbox>("ObjectHitbox",
+    "interactType", sol::property(&ObjectHitbox::interactType, &ObjectHitbox::interactType),
+    "downOffset", sol::property(&ObjectHitbox::downOffset, &ObjectHitbox::downOffset),
+    "damageOrCoinValue", sol::property(&ObjectHitbox::damageOrCoinValue, &ObjectHitbox::damageOrCoinValue),
+    "health", sol::property(&ObjectHitbox::health, &ObjectHitbox::health),
+    "numLootCoins", sol::property(&ObjectHitbox::numLootCoins, &ObjectHitbox::numLootCoins),
+    "radius", sol::property(&ObjectHitbox::radius, &ObjectHitbox::radius),
+    "height", sol::property(&ObjectHitbox::height, &ObjectHitbox::height),
+    "hurtboxRadius", sol::property(&ObjectHitbox::hurtboxRadius, &ObjectHitbox::hurtboxRadius),
+    "hurtboxHeight", sol::property(&ObjectHitbox::hurtboxHeight, &ObjectHitbox::hurtboxHeight)
+);
+
+lua.new_usertype<Waypoint>("Waypoint",
+    "flags", sol::property(&Waypoint::flags, &Waypoint::flags),
+    "pos", sol::property(&Waypoint::pos, &Waypoint::pos)
+);
+
+lua.new_usertype<Surface>("Surface",
+    "type", sol::property(&Surface::type, &Surface::type),
+    "force", sol::property(&Surface::force, &Surface::force),
+    "flags", sol::property(&Surface::flags, &Surface::flags),
+    "room", sol::property(&Surface::room, &Surface::room),
+    "lowerY", sol::property(&Surface::lowerY, &Surface::lowerY),
+    "upperY", sol::property(&Surface::upperY, &Surface::upperY),
+    "vertex1", sol::property(&Surface::vertex1, &Surface::vertex1),
+    "vertex2", sol::property(&Surface::vertex2, &Surface::vertex2),
+    "vertex3", sol::property(&Surface::vertex3, &Surface::vertex3),
+    "x", sol::overload([] (Surface& s) -> f32 { return s.normal.x; }, [] (Surface& s, f32 v) { s.normal.x = v; }),
+    "y", sol::overload([] (Surface& s) -> f32 { return s.normal.y; }, [] (Surface& s, f32 v) { s.normal.y = v; }),
+    "z", sol::overload([] (Surface& s) -> f32 { return s.normal.z; }, [] (Surface& s, f32 v) { s.normal.z = v; }),
+    "originOffset", sol::property(&Surface::originOffset, &Surface::originOffset),
+    "object", sol::property(&Surface::object, &Surface::object),
+    "prevVertex1", sol::property(&Surface::prevVertex1, &Surface::prevVertex1),
+    "prevVertex2", sol::property(&Surface::prevVertex2, &Surface::prevVertex2),
+    "prevVertex3", sol::property(&Surface::prevVertex3, &Surface::prevVertex3),
+    "modifiedTimestamp", sol::property(&Surface::modifiedTimestamp, &Surface::modifiedTimestamp)
+);
+
+lua.new_usertype<MarioBodyState>("MarioBodyState",
+    "action", sol::property(&MarioBodyState::action, &MarioBodyState::action),
+    "capState", sol::property(&MarioBodyState::capState, &MarioBodyState::capState),
+    "eyeState", sol::property(&MarioBodyState::eyeState, &MarioBodyState::eyeState),
+    "handState", sol::property(&MarioBodyState::handState, &MarioBodyState::handState),
+    "wingFlutter", sol::property(&MarioBodyState::wingFlutter, &MarioBodyState::wingFlutter),
+    "modelState", sol::property(&MarioBodyState::modelState, &MarioBodyState::modelState),
+    "grabPos", sol::property(&MarioBodyState::grabPos, &MarioBodyState::grabPos),
+    "punchState", sol::property(&MarioBodyState::punchState, &MarioBodyState::punchState),
+    "torsoAngle", sol::property(&MarioBodyState::torsoAngle, &MarioBodyState::torsoAngle),
+    "headAngle", sol::property(&MarioBodyState::headAngle, &MarioBodyState::headAngle),
+    "heldObjLastPosition", sol::property(&MarioBodyState::heldObjLastPosition, &MarioBodyState::heldObjLastPosition),
+    "filler", sol::overload([] (MarioBodyState& s, int i) -> u8 { return s.filler[i]; }, [] (MarioBodyState& s, int i, u8 v) { s.filler[i] = v; })
+);
+
+lua.new_usertype<MarioState>("MarioState",
+    "unk00", sol::property(&MarioState::unk00, &MarioState::unk00),
+    "input", sol::property(&MarioState::input, &MarioState::input),
+    "flags", sol::property(&MarioState::flags, &MarioState::flags),
+    "particleFlags", sol::property(&MarioState::particleFlags, &MarioState::particleFlags),
+    "action", sol::property(&MarioState::action, &MarioState::action),
+    "prevAction", sol::property(&MarioState::prevAction, &MarioState::prevAction),
+    "terrainSoundAddend", sol::property(&MarioState::terrainSoundAddend, &MarioState::terrainSoundAddend),
+    "actionState", sol::property(&MarioState::actionState, &MarioState::actionState),
+    "actionTimer", sol::property(&MarioState::actionTimer, &MarioState::actionTimer),
+    "actionArg", sol::property(&MarioState::actionArg, &MarioState::actionArg),
+    "intendedMag", sol::property(&MarioState::intendedMag, &MarioState::intendedMag),
+    "intendedYaw", sol::property(&MarioState::intendedYaw, &MarioState::intendedYaw),
+    "invincTimer", sol::property(&MarioState::invincTimer, &MarioState::invincTimer),
+    "framesSinceA", sol::property(&MarioState::framesSinceA, &MarioState::framesSinceA),
+    "framesSinceB", sol::property(&MarioState::framesSinceB, &MarioState::framesSinceB),
+    "wallKickTimer", sol::property(&MarioState::wallKickTimer, &MarioState::wallKickTimer),
+    "doubleJumpTimer", sol::property(&MarioState::doubleJumpTimer, &MarioState::doubleJumpTimer),
+    "faceAngle", sol::property(&MarioState::faceAngle, &MarioState::faceAngle),
+    "angleVel", sol::property(&MarioState::angleVel, &MarioState::angleVel),
+    "slideYaw", sol::property(&MarioState::slideYaw, &MarioState::slideYaw),
+    "twirlYaw", sol::property(&MarioState::twirlYaw, &MarioState::twirlYaw),
+    "pos", sol::property(&MarioState::pos, &MarioState::pos),
+    "vel", sol::property(&MarioState::vel, &MarioState::vel),
+    "forwardVel", sol::property(&MarioState::forwardVel, &MarioState::forwardVel),
+    "slideVelX", sol::property(&MarioState::slideVelX, &MarioState::slideVelX),
+    "slideVelZ", sol::property(&MarioState::slideVelZ, &MarioState::slideVelZ),
+    "wall", sol::property(&MarioState::wall, &MarioState::wall),
+    "ceil", sol::property(&MarioState::ceil, &MarioState::ceil),
+    "floor", sol::property(&MarioState::floor, &MarioState::floor),
+    "ceilHeight", sol::property(&MarioState::ceilHeight, &MarioState::ceilHeight),
+    "floorHeight", sol::property(&MarioState::floorHeight, &MarioState::floorHeight),
+    "floorAngle", sol::property(&MarioState::floorAngle, &MarioState::floorAngle),
+    "waterLevel", sol::property(&MarioState::waterLevel, &MarioState::waterLevel),
+    "interactObj", sol::property(&MarioState::interactObj, &MarioState::interactObj),
+    "heldObj", sol::property(&MarioState::heldObj, &MarioState::heldObj),
+    "usedObj", sol::property(&MarioState::usedObj, &MarioState::usedObj),
+    "riddenObj", sol::property(&MarioState::riddenObj, &MarioState::riddenObj),
+    "marioObj", sol::property(&MarioState::marioObj, &MarioState::marioObj),
+    "spawnInfo", sol::property(&MarioState::spawnInfo, &MarioState::spawnInfo),
+    "area", sol::property(&MarioState::area, &MarioState::area),
+    "statusForCamera", sol::property(&MarioState::statusForCamera, &MarioState::statusForCamera),
+    "marioBodyState", sol::property(&MarioState::marioBodyState, &MarioState::marioBodyState),
+    "controller", sol::property(&MarioState::controller, &MarioState::controller),
+    "collidedObjInteractTypes", sol::property(&MarioState::collidedObjInteractTypes, &MarioState::collidedObjInteractTypes),
+    "numCoins", sol::property(&MarioState::numCoins, &MarioState::numCoins),
+    "numStars", sol::property(&MarioState::numStars, &MarioState::numStars),
+    "numKeys", sol::property(&MarioState::numKeys, &MarioState::numKeys),
+    "numLives", sol::property(&MarioState::numLives, &MarioState::numLives),
+    "health", sol::property(&MarioState::health, &MarioState::health),
+    "unkB0", sol::property(&MarioState::unkB0, &MarioState::unkB0),
+    "hurtCounter", sol::property(&MarioState::hurtCounter, &MarioState::hurtCounter),
+    "healCounter", sol::property(&MarioState::healCounter, &MarioState::healCounter),
+    "squishTimer", sol::property(&MarioState::squishTimer, &MarioState::squishTimer),
+    "fadeWarpOpacity", sol::property(&MarioState::fadeWarpOpacity, &MarioState::fadeWarpOpacity),
+    "capTimer", sol::property(&MarioState::capTimer, &MarioState::capTimer),
+    "prevNumStarsForDialog", sol::property(&MarioState::prevNumStarsForDialog, &MarioState::prevNumStarsForDialog),
+    "peakHeight", sol::property(&MarioState::peakHeight, &MarioState::peakHeight),
+    "quicksandDepth", sol::property(&MarioState::quicksandDepth, &MarioState::quicksandDepth),
+    "unkC4", sol::property(&MarioState::unkC4, &MarioState::unkC4)
+);
+
+lua.new_usertype<PlayerCameraState>("PlayerCameraState",
+    "action", sol::property(&PlayerCameraState::action, &PlayerCameraState::action),
+    "pos", sol::property(&PlayerCameraState::pos, &PlayerCameraState::pos),
+    "faceAngle", sol::property(&PlayerCameraState::faceAngle, &PlayerCameraState::faceAngle),
+    "headRotation", sol::property(&PlayerCameraState::headRotation, &PlayerCameraState::headRotation),
+    "unused", sol::property(&PlayerCameraState::unused, &PlayerCameraState::unused),
+    "cameraEvent", sol::property(&PlayerCameraState::cameraEvent, &PlayerCameraState::cameraEvent),
+    "usedObj", sol::property(&PlayerCameraState::usedObj, &PlayerCameraState::usedObj)
+);
+
+lua.new_usertype<TransitionInfo>("TransitionInfo",
+    "posPitch", sol::property(&TransitionInfo::posPitch, &TransitionInfo::posPitch),
+    "posYaw", sol::property(&TransitionInfo::posYaw, &TransitionInfo::posYaw),
+    "posDist", sol::property(&TransitionInfo::posDist, &TransitionInfo::posDist),
+    "focPitch", sol::property(&TransitionInfo::focPitch, &TransitionInfo::focPitch),
+    "focYaw", sol::property(&TransitionInfo::focYaw, &TransitionInfo::focYaw),
+    "focDist", sol::property(&TransitionInfo::focDist, &TransitionInfo::focDist),
+    "framesLeft", sol::property(&TransitionInfo::framesLeft, &TransitionInfo::framesLeft),
+    "marioPos", sol::property(&TransitionInfo::marioPos, &TransitionInfo::marioPos),
+    "unused", sol::property(&TransitionInfo::unused, &TransitionInfo::unused)
+);
+
+lua.new_usertype<HandheldShakePoint>("HandheldShakePoint",
+    "index", sol::property(&HandheldShakePoint::index, &HandheldShakePoint::index),
+    "unused", sol::property(&HandheldShakePoint::unused, &HandheldShakePoint::unused),
+    "point", sol::property(&HandheldShakePoint::point, &HandheldShakePoint::point)
+);
+
+lua.new_usertype<CameraTrigger>("CameraTrigger",
+    "area", sol::property(&CameraTrigger::area, &CameraTrigger::area),
+    "event", sol::property(&CameraTrigger::event, &CameraTrigger::event),
+    "centerX", sol::property(&CameraTrigger::centerX, &CameraTrigger::centerX),
+    "centerY", sol::property(&CameraTrigger::centerY, &CameraTrigger::centerY),
+    "centerZ", sol::property(&CameraTrigger::centerZ, &CameraTrigger::centerZ),
+    "boundsX", sol::property(&CameraTrigger::boundsX, &CameraTrigger::boundsX),
+    "boundsY", sol::property(&CameraTrigger::boundsY, &CameraTrigger::boundsY),
+    "boundsZ", sol::property(&CameraTrigger::boundsZ, &CameraTrigger::boundsZ),
+    "boundsYaw", sol::property(&CameraTrigger::boundsYaw, &CameraTrigger::boundsYaw)
+);
+
+lua.new_usertype<Cutscene>("Cutscene",
+    "shot", sol::property(&Cutscene::shot, &Cutscene::shot),
+    "duration", sol::property(&Cutscene::duration, &Cutscene::duration)
+);
+
+lua.new_usertype<CameraFOVStatus>("CameraFOVStatus",
+    "fovFunc", sol::property(&CameraFOVStatus::fovFunc, &CameraFOVStatus::fovFunc),
+    "fov", sol::property(&CameraFOVStatus::fov, &CameraFOVStatus::fov),
+    "fovOffset", sol::property(&CameraFOVStatus::fovOffset, &CameraFOVStatus::fovOffset),
+    "unusedIsSleeping", sol::property(&CameraFOVStatus::unusedIsSleeping, &CameraFOVStatus::unusedIsSleeping),
+    "shakeAmplitude", sol::property(&CameraFOVStatus::shakeAmplitude, &CameraFOVStatus::shakeAmplitude),
+    "shakePhase", sol::property(&CameraFOVStatus::shakePhase, &CameraFOVStatus::shakePhase),
+    "shakeSpeed", sol::property(&CameraFOVStatus::shakeSpeed, &CameraFOVStatus::shakeSpeed),
+    "decay", sol::property(&CameraFOVStatus::decay, &CameraFOVStatus::decay)
+);
+
+lua.new_usertype<CutsceneSplinePoint>("CutsceneSplinePoint",
+    "index", sol::property(&CutsceneSplinePoint::index, &CutsceneSplinePoint::index),
+    "speed", sol::property(&CutsceneSplinePoint::speed, &CutsceneSplinePoint::speed),
+    "point", sol::property(&CutsceneSplinePoint::point, &CutsceneSplinePoint::point)
+);
+
+lua.new_usertype<PlayerGeometry>("PlayerGeometry",
+    "currFloor", sol::property(&PlayerGeometry::currFloor, &PlayerGeometry::currFloor),
+    "currFloorHeight", sol::property(&PlayerGeometry::currFloorHeight, &PlayerGeometry::currFloorHeight),
+    "currFloorType", sol::property(&PlayerGeometry::currFloorType, &PlayerGeometry::currFloorType),
+    "currCeil", sol::property(&PlayerGeometry::currCeil, &PlayerGeometry::currCeil),
+    "currCeilType", sol::property(&PlayerGeometry::currCeilType, &PlayerGeometry::currCeilType),
+    "currCeilHeight", sol::property(&PlayerGeometry::currCeilHeight, &PlayerGeometry::currCeilHeight),
+    "prevFloor", sol::property(&PlayerGeometry::prevFloor, &PlayerGeometry::prevFloor),
+    "prevFloorHeight", sol::property(&PlayerGeometry::prevFloorHeight, &PlayerGeometry::prevFloorHeight),
+    "prevFloorType", sol::property(&PlayerGeometry::prevFloorType, &PlayerGeometry::prevFloorType),
+    "prevCeil", sol::property(&PlayerGeometry::prevCeil, &PlayerGeometry::prevCeil),
+    "prevCeilHeight", sol::property(&PlayerGeometry::prevCeilHeight, &PlayerGeometry::prevCeilHeight),
+    "prevCeilType", sol::property(&PlayerGeometry::prevCeilType, &PlayerGeometry::prevCeilType),
+    "waterHeight", sol::property(&PlayerGeometry::waterHeight, &PlayerGeometry::waterHeight)
+);
+
+lua.new_usertype<LinearTransitionPoint>("LinearTransitionPoint",
+    "focus", sol::property(&LinearTransitionPoint::focus, &LinearTransitionPoint::focus),
+    "pos", sol::property(&LinearTransitionPoint::pos, &LinearTransitionPoint::pos),
+    "dist", sol::property(&LinearTransitionPoint::dist, &LinearTransitionPoint::dist),
+    "pitch", sol::property(&LinearTransitionPoint::pitch, &LinearTransitionPoint::pitch),
+    "yaw", sol::property(&LinearTransitionPoint::yaw, &LinearTransitionPoint::yaw)
+);
+
+lua.new_usertype<ModeTransitionInfo>("ModeTransitionInfo",
+    "newMode", sol::property(&ModeTransitionInfo::newMode, &ModeTransitionInfo::newMode),
+    "lastMode", sol::property(&ModeTransitionInfo::lastMode, &ModeTransitionInfo::lastMode),
+    "max", sol::property(&ModeTransitionInfo::max, &ModeTransitionInfo::max),
+    "frame", sol::property(&ModeTransitionInfo::frame, &ModeTransitionInfo::frame),
+    "transitionStart", sol::property(&ModeTransitionInfo::transitionStart, &ModeTransitionInfo::transitionStart),
+    "transitionEnd", sol::property(&ModeTransitionInfo::transitionEnd, &ModeTransitionInfo::transitionEnd)
+);
+
+lua.new_usertype<ParallelTrackingPoint>("ParallelTrackingPoint",
+    "startOfPath", sol::property(&ParallelTrackingPoint::startOfPath, &ParallelTrackingPoint::startOfPath),
+    "pos", sol::property(&ParallelTrackingPoint::pos, &ParallelTrackingPoint::pos),
+    "distThresh", sol::property(&ParallelTrackingPoint::distThresh, &ParallelTrackingPoint::distThresh),
+    "zoom", sol::property(&ParallelTrackingPoint::zoom, &ParallelTrackingPoint::zoom)
+);
+
+lua.new_usertype<CameraStoredInfo>("CameraStoredInfo",
+    "pos", sol::property(&CameraStoredInfo::pos, &CameraStoredInfo::pos),
+    "focus", sol::property(&CameraStoredInfo::focus, &CameraStoredInfo::focus),
+    "panDist", sol::property(&CameraStoredInfo::panDist, &CameraStoredInfo::panDist),
+    "cannonYOffset", sol::property(&CameraStoredInfo::cannonYOffset, &CameraStoredInfo::cannonYOffset)
+);
+
+lua.new_usertype<CutsceneVariable>("CutsceneVariable",
+    "unused1", sol::property(&CutsceneVariable::unused1, &CutsceneVariable::unused1),
+    "point", sol::property(&CutsceneVariable::point, &CutsceneVariable::point),
+    "unusedPoint", sol::property(&CutsceneVariable::unusedPoint, &CutsceneVariable::unusedPoint),
+    "angle", sol::property(&CutsceneVariable::angle, &CutsceneVariable::angle),
+    "unused2", sol::property(&CutsceneVariable::unused2, &CutsceneVariable::unused2)
+);
+
+lua.new_usertype<Camera>("Camera",
+    "mode", sol::property(&Camera::mode, &Camera::mode),
+    "defMode", sol::property(&Camera::defMode, &Camera::defMode),
+    "yaw", sol::property(&Camera::yaw, &Camera::yaw),
+    "focus", sol::property(&Camera::focus, &Camera::focus),
+    "pos", sol::property(&Camera::pos, &Camera::pos),
+    "unusedVec1", sol::property(&Camera::unusedVec1, &Camera::unusedVec1),
+    "areaCenX", sol::property(&Camera::areaCenX, &Camera::areaCenX),
+    "areaCenZ", sol::property(&Camera::areaCenZ, &Camera::areaCenZ),
+    "cutscene", sol::property(&Camera::cutscene, &Camera::cutscene),
+    "filler1", sol::overload([] (Camera& s, int i) -> u8 { return s.filler1[i]; }, [] (Camera& s, int i, u8 v) { s.filler1[i] = v; }),
+    "nextYaw", sol::property(&Camera::nextYaw, &Camera::nextYaw),
+    "filler2", sol::overload([] (Camera& s, int i) -> u8 { return s.filler2[i]; }, [] (Camera& s, int i, u8 v) { s.filler2[i] = v; }),
+    "doorStatus", sol::property(&Camera::doorStatus, &Camera::doorStatus),
+    "areaCenY", sol::property(&Camera::areaCenY, &Camera::areaCenY)
+);
+
+lua.new_usertype<LakituState>("LakituState",
+    "curFocus", sol::property(&LakituState::curFocus, &LakituState::curFocus),
+    "curPos", sol::property(&LakituState::curPos, &LakituState::curPos),
+    "goalFocus", sol::property(&LakituState::goalFocus, &LakituState::goalFocus),
+    "goalPos", sol::property(&LakituState::goalPos, &LakituState::goalPos),
+    "filler1", sol::overload([] (LakituState& s, int i) -> u8 { return s.filler1[i]; }, [] (LakituState& s, int i, u8 v) { s.filler1[i] = v; }),
+    "mode", sol::property(&LakituState::mode, &LakituState::mode),
+    "defMode", sol::property(&LakituState::defMode, &LakituState::defMode),
+    "filler2", sol::overload([] (LakituState& s, int i) -> u8 { return s.filler2[i]; }, [] (LakituState& s, int i, u8 v) { s.filler2[i] = v; }),
+    "focusDistance", sol::property(&LakituState::focusDistance, &LakituState::focusDistance),
+    "oldPitch", sol::property(&LakituState::oldPitch, &LakituState::oldPitch),
+    "oldYaw", sol::property(&LakituState::oldYaw, &LakituState::oldYaw),
+    "oldRoll", sol::property(&LakituState::oldRoll, &LakituState::oldRoll),
+    "shakeMagnitude", sol::property(&LakituState::shakeMagnitude, &LakituState::shakeMagnitude),
+    "shakePitchPhase", sol::property(&LakituState::shakePitchPhase, &LakituState::shakePitchPhase),
+    "shakePitchVel", sol::property(&LakituState::shakePitchVel, &LakituState::shakePitchVel),
+    "shakePitchDecay", sol::property(&LakituState::shakePitchDecay, &LakituState::shakePitchDecay),
+    "unusedVec1", sol::property(&LakituState::unusedVec1, &LakituState::unusedVec1),
+    "unusedVec2", sol::property(&LakituState::unusedVec2, &LakituState::unusedVec2),
+    "filler3", sol::overload([] (LakituState& s, int i) -> u8 { return s.filler3[i]; }, [] (LakituState& s, int i, u8 v) { s.filler3[i] = v; }),
+    "roll", sol::property(&LakituState::roll, &LakituState::roll),
+    "yaw", sol::property(&LakituState::yaw, &LakituState::yaw),
+    "nextYaw", sol::property(&LakituState::nextYaw, &LakituState::nextYaw),
+    "focus", sol::property(&LakituState::focus, &LakituState::focus),
+    "pos", sol::property(&LakituState::pos, &LakituState::pos),
+    "shakeRollPhase", sol::property(&LakituState::shakeRollPhase, &LakituState::shakeRollPhase),
+    "shakeRollVel", sol::property(&LakituState::shakeRollVel, &LakituState::shakeRollVel),
+    "shakeRollDecay", sol::property(&LakituState::shakeRollDecay, &LakituState::shakeRollDecay),
+    "shakeYawPhase", sol::property(&LakituState::shakeYawPhase, &LakituState::shakeYawPhase),
+    "shakeYawVel", sol::property(&LakituState::shakeYawVel, &LakituState::shakeYawVel),
+    "shakeYawDecay", sol::property(&LakituState::shakeYawDecay, &LakituState::shakeYawDecay),
+    "focHSpeed", sol::property(&LakituState::focHSpeed, &LakituState::focHSpeed),
+    "focVSpeed", sol::property(&LakituState::focVSpeed, &LakituState::focVSpeed),
+    "posHSpeed", sol::property(&LakituState::posHSpeed, &LakituState::posHSpeed),
+    "posVSpeed", sol::property(&LakituState::posVSpeed, &LakituState::posVSpeed),
+    "keyDanceRoll", sol::property(&LakituState::keyDanceRoll, &LakituState::keyDanceRoll),
+    "lastFrameAction", sol::property(&LakituState::lastFrameAction, &LakituState::lastFrameAction),
+    "unused", sol::property(&LakituState::unused, &LakituState::unused),
+    "skipCameraInterpolationTimestamp", sol::property(&LakituState::skipCameraInterpolationTimestamp, &LakituState::skipCameraInterpolationTimestamp)
+);
+
+lua.new_usertype<DialogEntry>("DialogEntry",
+    "unused", sol::property(&DialogEntry::unused, &DialogEntry::unused),
+    "linesPerBox", sol::property(&DialogEntry::linesPerBox, &DialogEntry::linesPerBox),
+    "leftOffset", sol::property(&DialogEntry::leftOffset, &DialogEntry::leftOffset),
+    "width", sol::property(&DialogEntry::width, &DialogEntry::width),
+    "str", sol::property(&DialogEntry::str, &DialogEntry::str)
+);
+
+lua.new_usertype<MovtexQuadCollection>("MovtexQuadCollection",
+    "id", sol::property(&MovtexQuadCollection::id, &MovtexQuadCollection::id),
+    "quadArraySegmented", sol::property(&MovtexQuadCollection::quadArraySegmented, &MovtexQuadCollection::quadArraySegmented)
+);
+
+lua.new_usertype<WarpNode>("WarpNode",
+    "id", sol::property(&WarpNode::id, &WarpNode::id),
+    "destLevel", sol::property(&WarpNode::destLevel, &WarpNode::destLevel),
+    "destArea", sol::property(&WarpNode::destArea, &WarpNode::destArea),
+    "destNode", sol::property(&WarpNode::destNode, &WarpNode::destNode)
+);
+
+lua.new_usertype<ObjectWarpNode>("ObjectWarpNode",
+    "node", sol::property(&ObjectWarpNode::node, &ObjectWarpNode::node),
+    "object", sol::property(&ObjectWarpNode::object, &ObjectWarpNode::object),
+    "next", sol::property(&ObjectWarpNode::next, &ObjectWarpNode::next)
+);
+
+lua.new_usertype<InstantWarp>("InstantWarp",
+    "id", sol::property(&InstantWarp::id, &InstantWarp::id),
+    "area", sol::property(&InstantWarp::area, &InstantWarp::area),
+    "displacement", sol::property(&InstantWarp::displacement, &InstantWarp::displacement)
+);
+
+lua.new_usertype<SpawnInfo>("SpawnInfo",
+    "startPos", sol::property(&SpawnInfo::startPos, &SpawnInfo::startPos),
+    "startAngle", sol::property(&SpawnInfo::startAngle, &SpawnInfo::startAngle),
+    "areaIndex", sol::property(&SpawnInfo::areaIndex, &SpawnInfo::areaIndex),
+    "activeAreaIndex", sol::property(&SpawnInfo::activeAreaIndex, &SpawnInfo::activeAreaIndex),
+    "behaviorArg", sol::property(&SpawnInfo::behaviorArg, &SpawnInfo::behaviorArg),
+    "behaviorScript", sol::property(&SpawnInfo::behaviorScript, &SpawnInfo::behaviorScript),
+    "model", sol::property(&SpawnInfo::model, &SpawnInfo::model),
+    "next", sol::property(&SpawnInfo::next, &SpawnInfo::next)
+);
+
+lua.new_usertype<UnusedArea28>("UnusedArea28",
+    "unk00", sol::property(&UnusedArea28::unk00, &UnusedArea28::unk00),
+    "unk02", sol::property(&UnusedArea28::unk02, &UnusedArea28::unk02),
+    "unk04", sol::property(&UnusedArea28::unk04, &UnusedArea28::unk04),
+    "unk06", sol::property(&UnusedArea28::unk06, &UnusedArea28::unk06),
+    "unk08", sol::property(&UnusedArea28::unk08, &UnusedArea28::unk08)
+);
+
+lua.new_usertype<Whirlpool>("Whirlpool",
+    "pos", sol::property(&Whirlpool::pos, &Whirlpool::pos),
+    "strength", sol::property(&Whirlpool::strength, &Whirlpool::strength)
+);
+
+lua.new_usertype<Area>("Area",
+    "index", sol::property(&Area::index, &Area::index),
+    "flags", sol::property(&Area::flags, &Area::flags),
+    "terrainType", sol::property(&Area::terrainType, &Area::terrainType),
+    "unk04", sol::property(&Area::unk04, &Area::unk04),
+    "terrainData", sol::property(&Area::terrainData, &Area::terrainData),
+    "surfaceRooms", sol::property(&Area::surfaceRooms, &Area::surfaceRooms),
+    "macroObjects", sol::property(&Area::macroObjects, &Area::macroObjects),
+    "warpNodes", sol::property(&Area::warpNodes, &Area::warpNodes),
+    "paintingWarpNodes", sol::property(&Area::paintingWarpNodes, &Area::paintingWarpNodes),
+    "instantWarps", sol::property(&Area::instantWarps, &Area::instantWarps),
+    "objectSpawnInfos", sol::property(&Area::objectSpawnInfos, &Area::objectSpawnInfos),
+    "camera", sol::property(&Area::camera, &Area::camera),
+    "unused", sol::property(&Area::unused, &Area::unused),
+    "whirlpools", sol::overload([] (Area& s, int i) -> struct Whirlpool* { return s.whirlpools[i]; }, [] (Area& s, int i, struct Whirlpool* v) { s.whirlpools[i] = v; }),
+    "dialog", sol::overload([] (Area& s, int i) -> u8 { return s.dialog[i]; }, [] (Area& s, int i, u8 v) { s.dialog[i] = v; }),
+    "musicParam", sol::property(&Area::musicParam, &Area::musicParam),
+    "musicParam2", sol::property(&Area::musicParam2, &Area::musicParam2)
+);
+
+lua.new_usertype<WarpTransitionData>("WarpTransitionData",
+    "red", sol::property(&WarpTransitionData::red, &WarpTransitionData::red),
+    "green", sol::property(&WarpTransitionData::green, &WarpTransitionData::green),
+    "blue", sol::property(&WarpTransitionData::blue, &WarpTransitionData::blue),
+    "startTexRadius", sol::property(&WarpTransitionData::startTexRadius, &WarpTransitionData::startTexRadius),
+    "endTexRadius", sol::property(&WarpTransitionData::endTexRadius, &WarpTransitionData::endTexRadius),
+    "startTexX", sol::property(&WarpTransitionData::startTexX, &WarpTransitionData::startTexX),
+    "startTexY", sol::property(&WarpTransitionData::startTexY, &WarpTransitionData::startTexY),
+    "endTexX", sol::property(&WarpTransitionData::endTexX, &WarpTransitionData::endTexX),
+    "endTexY", sol::property(&WarpTransitionData::endTexY, &WarpTransitionData::endTexY),
+    "texTimer", sol::property(&WarpTransitionData::texTimer, &WarpTransitionData::texTimer)
+);
+
+lua.new_usertype<WarpTransition>("WarpTransition",
+    "isActive", sol::property(&WarpTransition::isActive, &WarpTransition::isActive),
+    "type", sol::property(&WarpTransition::type, &WarpTransition::type),
+    "time", sol::property(&WarpTransition::time, &WarpTransition::time),
+    "pauseRendering", sol::property(&WarpTransition::pauseRendering, &WarpTransition::pauseRendering),
+    "data", sol::property(&WarpTransition::data, &WarpTransition::data)
+);
+
+lua.new_usertype<CreditsEntry>("CreditsEntry",
+    "levelNum", sol::property(&CreditsEntry::levelNum, &CreditsEntry::levelNum),
+    "areaIndex", sol::property(&CreditsEntry::areaIndex, &CreditsEntry::areaIndex),
+    "unk02", sol::property(&CreditsEntry::unk02, &CreditsEntry::unk02),
+    "marioAngle", sol::property(&CreditsEntry::marioAngle, &CreditsEntry::marioAngle),
+    "marioPos", sol::property(&CreditsEntry::marioPos, &CreditsEntry::marioPos),
+    "unk0C", sol::property(&CreditsEntry::unk0C, &CreditsEntry::unk0C)
+);
+
+lua.new_usertype<WarpDest>("WarpDest",
+    "type", sol::property(&WarpDest::type, &WarpDest::type),
+    "levelNum", sol::property(&WarpDest::levelNum, &WarpDest::levelNum),
+    "areaIdx", sol::property(&WarpDest::areaIdx, &WarpDest::areaIdx),
+    "nodeId", sol::property(&WarpDest::nodeId, &WarpDest::nodeId),
+    "arg", sol::property(&WarpDest::arg, &WarpDest::arg)
+);
+
+lua.new_usertype<HudDisplay>("HudDisplay",
+    "lives", sol::property(&HudDisplay::lives, &HudDisplay::lives),
+    "coins", sol::property(&HudDisplay::coins, &HudDisplay::coins),
+    "stars", sol::property(&HudDisplay::stars, &HudDisplay::stars),
+    "wedges", sol::property(&HudDisplay::wedges, &HudDisplay::wedges),
+    "keys", sol::property(&HudDisplay::keys, &HudDisplay::keys),
+    "flags", sol::property(&HudDisplay::flags, &HudDisplay::flags),
+    "timer", sol::property(&HudDisplay::timer, &HudDisplay::timer)
+);
+
+lua.new_usertype<SaveBlockSignature>("SaveBlockSignature",
+    "magic", sol::property(&SaveBlockSignature::magic, &SaveBlockSignature::magic),
+    "chksum", sol::property(&SaveBlockSignature::chksum, &SaveBlockSignature::chksum)
+);
+
+lua.new_usertype<SaveFile>("SaveFile",
+    "capLevel", sol::property(&SaveFile::capLevel, &SaveFile::capLevel),
+    "capArea", sol::property(&SaveFile::capArea, &SaveFile::capArea),
+    "capPos", sol::property(&SaveFile::capPos, &SaveFile::capPos),
+    "flags", sol::property(&SaveFile::flags, &SaveFile::flags),
+    "courseStars", sol::overload([] (SaveFile& s, int i) -> u8 { return s.courseStars[i]; }, [] (SaveFile& s, int i, u8 v) { s.courseStars[i] = v; }),
+    "courseCoinScores", sol::overload([] (SaveFile& s, int i) -> u8 { return s.courseCoinScores[i]; }, [] (SaveFile& s, int i, u8 v) { s.courseCoinScores[i] = v; }),
+    "signature", sol::property(&SaveFile::signature, &SaveFile::signature)
+);
+
+lua.new_usertype<MainMenuSaveData>("MainMenuSaveData",
+    "coinScoreAges", sol::overload([] (MainMenuSaveData& s, int i) -> u32 { return s.coinScoreAges[i]; }, [] (MainMenuSaveData& s, int i, u32 v) { s.coinScoreAges[i] = v; }),
+    "soundMode", sol::property(&MainMenuSaveData::soundMode, &MainMenuSaveData::soundMode),
+    "signature", sol::property(&MainMenuSaveData::signature, &MainMenuSaveData::signature)
+);
+
+lua.new_usertype<SaveBuffer>("SaveBuffer",
+    "files", sol::overload([] (SaveBuffer& s, int i, int j) -> struct SaveFile { return s.files[i][j]; }, [] (SaveBuffer& s, int i, int j, struct SaveFile v) { s.files[i][j] = v; }),
+    "menuData", sol::overload([] (SaveBuffer& s, int i) -> struct MainMenuSaveData { return s.menuData[i]; }, [] (SaveBuffer& s, int i, struct MainMenuSaveData v) { s.menuData[i] = v; })
+);
+
+lua.new_usertype<WarpCheckpoint>("WarpCheckpoint",
+    "actNum", sol::property(&WarpCheckpoint::actNum, &WarpCheckpoint::actNum),
+    "courseNum", sol::property(&WarpCheckpoint::courseNum, &WarpCheckpoint::courseNum),
+    "levelID", sol::property(&WarpCheckpoint::levelID, &WarpCheckpoint::levelID),
+    "areaNum", sol::property(&WarpCheckpoint::areaNum, &WarpCheckpoint::areaNum),
+    "warpNode", sol::property(&WarpCheckpoint::warpNode, &WarpCheckpoint::warpNode)
+);
+
+lua.new_usertype<SoundState>("SoundState",
+    "playSound", sol::property(&SoundState::playSound, &SoundState::playSound),
+    "animFrame1", sol::property(&SoundState::animFrame1, &SoundState::animFrame1),
+    "animFrame2", sol::property(&SoundState::animFrame2, &SoundState::animFrame2),
+    "soundMagic", sol::property(&SoundState::soundMagic, &SoundState::soundMagic)
+);
+
+lua.new_usertype<ChainSegment>("ChainSegment",
+    "posX", sol::property(&ChainSegment::posX, &ChainSegment::posX),
+    "posY", sol::property(&ChainSegment::posY, &ChainSegment::posY),
+    "posZ", sol::property(&ChainSegment::posZ, &ChainSegment::posZ),
+    "pitch", sol::property(&ChainSegment::pitch, &ChainSegment::pitch),
+    "yaw", sol::property(&ChainSegment::yaw, &ChainSegment::yaw),
+    "roll", sol::property(&ChainSegment::roll, &ChainSegment::roll)
+);
+
+lua.new_usertype<WaterDropletParams>("WaterDropletParams",
+    "flags", sol::property(&WaterDropletParams::flags, &WaterDropletParams::flags),
+    "model", sol::property(&WaterDropletParams::model, &WaterDropletParams::model),
+    "behavior", sol::property(&WaterDropletParams::behavior, &WaterDropletParams::behavior),
+    "moveAngleRange", sol::property(&WaterDropletParams::moveAngleRange, &WaterDropletParams::moveAngleRange),
+    "moveRange", sol::property(&WaterDropletParams::moveRange, &WaterDropletParams::moveRange),
+    "randForwardVelOffset", sol::property(&WaterDropletParams::randForwardVelOffset, &WaterDropletParams::randForwardVelOffset),
+    "randForwardVelScale", sol::property(&WaterDropletParams::randForwardVelScale, &WaterDropletParams::randForwardVelScale),
+    "randYVelOffset", sol::property(&WaterDropletParams::randYVelOffset, &WaterDropletParams::randYVelOffset),
+    "randYVelScale", sol::property(&WaterDropletParams::randYVelScale, &WaterDropletParams::randYVelScale),
+    "randSizeOffset", sol::property(&WaterDropletParams::randSizeOffset, &WaterDropletParams::randSizeOffset),
+    "randSizeScale", sol::property(&WaterDropletParams::randSizeScale, &WaterDropletParams::randSizeScale)
+);
+
+lua.new_usertype<struct802A1230>("struct802A1230",
+    "unk00", sol::property(&struct802A1230::unk00, &struct802A1230::unk00),
+    "unk02", sol::property(&struct802A1230::unk02, &struct802A1230::unk02)
+);
+
+lua.new_usertype<Struct802A272C>("Struct802A272C",
+    "vecF", sol::property(&Struct802A272C::vecF, &Struct802A272C::vecF),
+    "vecS", sol::property(&Struct802A272C::vecS, &Struct802A272C::vecS)
+);
+
+lua.new_usertype<SpawnParticlesInfo>("SpawnParticlesInfo",
+    "behParam", sol::property(&SpawnParticlesInfo::behParam, &SpawnParticlesInfo::behParam),
+    "count", sol::property(&SpawnParticlesInfo::count, &SpawnParticlesInfo::count),
+    "model", sol::property(&SpawnParticlesInfo::model, &SpawnParticlesInfo::model),
+    "offsetY", sol::property(&SpawnParticlesInfo::offsetY, &SpawnParticlesInfo::offsetY),
+    "forwardVelBase", sol::property(&SpawnParticlesInfo::forwardVelBase, &SpawnParticlesInfo::forwardVelBase),
+    "forwardVelRange", sol::property(&SpawnParticlesInfo::forwardVelRange, &SpawnParticlesInfo::forwardVelRange),
+    "velYBase", sol::property(&SpawnParticlesInfo::velYBase, &SpawnParticlesInfo::velYBase),
+    "velYRange", sol::property(&SpawnParticlesInfo::velYRange, &SpawnParticlesInfo::velYRange),
+    "gravity", sol::property(&SpawnParticlesInfo::gravity, &SpawnParticlesInfo::gravity),
+    "dragStrength", sol::property(&SpawnParticlesInfo::dragStrength, &SpawnParticlesInfo::dragStrength),
+    "sizeBase", sol::property(&SpawnParticlesInfo::sizeBase, &SpawnParticlesInfo::sizeBase),
+    "sizeRange", sol::property(&SpawnParticlesInfo::sizeRange, &SpawnParticlesInfo::sizeRange)
+);
+
+lua.new_usertype<AllocOnlyPool>("AllocOnlyPool",
+    "totalSpace", sol::property(&AllocOnlyPool::totalSpace, &AllocOnlyPool::totalSpace),
+    "usedSpace", sol::property(&AllocOnlyPool::usedSpace, &AllocOnlyPool::usedSpace),
+    "startPtr", sol::property(&AllocOnlyPool::startPtr, &AllocOnlyPool::startPtr),
+    "freePtr", sol::property(&AllocOnlyPool::freePtr, &AllocOnlyPool::freePtr)
+);
+
+lua.new_usertype<OffsetSizePair>("OffsetSizePair",
+    "offset", sol::property(&OffsetSizePair::offset, &OffsetSizePair::offset),
+    "size", sol::property(&OffsetSizePair::size, &OffsetSizePair::size)
+);
+
+lua.new_usertype<DmaTable>("DmaTable",
+    "count", sol::property(&DmaTable::count, &DmaTable::count),
+    "srcAddr", sol::property(&DmaTable::srcAddr, &DmaTable::srcAddr),
+    "anim", sol::overload([] (DmaTable& s, int i) -> struct OffsetSizePair { return s.anim[i]; }, [] (DmaTable& s, int i, struct OffsetSizePair v) { s.anim[i] = v; })
+);
+
+lua.new_usertype<DmaHandlerList>("DmaHandlerList",
+    "dmaTable", sol::property(&DmaHandlerList::dmaTable, &DmaHandlerList::dmaTable),
+    "currentAddr", sol::property(&DmaHandlerList::currentAddr, &DmaHandlerList::currentAddr),
+    "bufTarget", sol::property(&DmaHandlerList::bufTarget, &DmaHandlerList::bufTarget)
+);
+
+lua.new_usertype<ProfilerFrameData>("ProfilerFrameData",
+    "numSoundTimes", sol::property(&ProfilerFrameData::numSoundTimes, &ProfilerFrameData::numSoundTimes),
+    "numVblankTimes", sol::property(&ProfilerFrameData::numVblankTimes, &ProfilerFrameData::numVblankTimes),
+    "gameTimes", sol::overload([] (ProfilerFrameData& s, int i) -> OSTime { return s.gameTimes[i]; }, [] (ProfilerFrameData& s, int i, OSTime v) { s.gameTimes[i] = v; }),
+    "gfxTimes", sol::overload([] (ProfilerFrameData& s, int i) -> OSTime { return s.gfxTimes[i]; }, [] (ProfilerFrameData& s, int i, OSTime v) { s.gfxTimes[i] = v; }),
+    "soundTimes", sol::overload([] (ProfilerFrameData& s, int i) -> OSTime { return s.soundTimes[i]; }, [] (ProfilerFrameData& s, int i, OSTime v) { s.soundTimes[i] = v; }),
+    "vblankTimes", sol::overload([] (ProfilerFrameData& s, int i) -> OSTime { return s.vblankTimes[i]; }, [] (ProfilerFrameData& s, int i, OSTime v) { s.vblankTimes[i] = v; })
+);
+
+lua.new_usertype<EnvFxParticle>("EnvFxParticle",
+    "isAlive", sol::property(&EnvFxParticle::isAlive, &EnvFxParticle::isAlive),
+    "animFrame", sol::property(&EnvFxParticle::animFrame, &EnvFxParticle::animFrame),
+    "xPos", sol::property(&EnvFxParticle::xPos, &EnvFxParticle::xPos),
+    "yPos", sol::property(&EnvFxParticle::yPos, &EnvFxParticle::yPos),
+    "zPos", sol::property(&EnvFxParticle::zPos, &EnvFxParticle::zPos),
+    "angleAndDist", sol::overload([] (EnvFxParticle& s, int i) -> s32 { return s.angleAndDist[i]; }, [] (EnvFxParticle& s, int i, s32 v) { s.angleAndDist[i] = v; }),
+    "unusedBubbleVar", sol::property(&EnvFxParticle::unusedBubbleVar, &EnvFxParticle::unusedBubbleVar),
+    "bubbleY", sol::property(&EnvFxParticle::bubbleY, &EnvFxParticle::bubbleY),
+    "spawnTimestamp", sol::property(&EnvFxParticle::spawnTimestamp, &EnvFxParticle::spawnTimestamp)
+);
+
+lua.new_usertype<GfxPool>("GfxPool",
+    "buffer", sol::overload([] (GfxPool& s, int i) -> Gfx { return s.buffer[i]; }, [] (GfxPool& s, int i, Gfx v) { s.buffer[i] = v; }),
+    "spTask", sol::property(&GfxPool::spTask, &GfxPool::spTask)
+);
+
+lua.new_usertype<DemoInput>("DemoInput",
+    "timer", sol::property(&DemoInput::timer, &DemoInput::timer),
+    "rawStickX", sol::property(&DemoInput::rawStickX, &DemoInput::rawStickX),
+    "rawStickY", sol::property(&DemoInput::rawStickY, &DemoInput::rawStickY),
+    "buttonMask", sol::property(&DemoInput::buttonMask, &DemoInput::buttonMask)
+);
+
+lua.new_usertype<NumTimesCalled>("NumTimesCalled",
+    "floor", sol::property(&NumTimesCalled::floor, &NumTimesCalled::floor),
+    "ceil", sol::property(&NumTimesCalled::ceil, &NumTimesCalled::ceil),
+    "wall", sol::property(&NumTimesCalled::wall, &NumTimesCalled::wall)
+);
+
+lua.new_usertype<Painting>("Painting",
+    "id", sol::property(&Painting::id, &Painting::id),
+    "imageCount", sol::property(&Painting::imageCount, &Painting::imageCount),
+    "textureType", sol::property(&Painting::textureType, &Painting::textureType),
+    "lastFloor", sol::property(&Painting::lastFloor, &Painting::lastFloor),
+    "currFloor", sol::property(&Painting::currFloor, &Painting::currFloor),
+    "floorEntered", sol::property(&Painting::floorEntered, &Painting::floorEntered),
+    "state", sol::property(&Painting::state, &Painting::state),
+    "pitch", sol::property(&Painting::pitch, &Painting::pitch),
+    "yaw", sol::property(&Painting::yaw, &Painting::yaw),
+    "posX", sol::property(&Painting::posX, &Painting::posX),
+    "posY", sol::property(&Painting::posY, &Painting::posY),
+    "posZ", sol::property(&Painting::posZ, &Painting::posZ),
+    "currRippleMag", sol::property(&Painting::currRippleMag, &Painting::currRippleMag),
+    "passiveRippleMag", sol::property(&Painting::passiveRippleMag, &Painting::passiveRippleMag),
+    "entryRippleMag", sol::property(&Painting::entryRippleMag, &Painting::entryRippleMag),
+    "rippleDecay", sol::property(&Painting::rippleDecay, &Painting::rippleDecay),
+    "passiveRippleDecay", sol::property(&Painting::passiveRippleDecay, &Painting::passiveRippleDecay),
+    "entryRippleDecay", sol::property(&Painting::entryRippleDecay, &Painting::entryRippleDecay),
+    "currRippleRate", sol::property(&Painting::currRippleRate, &Painting::currRippleRate),
+    "passiveRippleRate", sol::property(&Painting::passiveRippleRate, &Painting::passiveRippleRate),
+    "entryRippleRate", sol::property(&Painting::entryRippleRate, &Painting::entryRippleRate),
+    "dispersionFactor", sol::property(&Painting::dispersionFactor, &Painting::dispersionFactor),
+    "passiveDispersionFactor", sol::property(&Painting::passiveDispersionFactor, &Painting::passiveDispersionFactor),
+    "entryDispersionFactor", sol::property(&Painting::entryDispersionFactor, &Painting::entryDispersionFactor),
+    "rippleTimer", sol::property(&Painting::rippleTimer, &Painting::rippleTimer),
+    "rippleX", sol::property(&Painting::rippleX, &Painting::rippleX),
+    "rippleY", sol::property(&Painting::rippleY, &Painting::rippleY),
+    "normalDisplayList", sol::property(&Painting::normalDisplayList, &Painting::normalDisplayList),
+    "textureMaps", sol::property(&Painting::textureMaps, &Painting::textureMaps),
+    "textureArray", sol::property(&Painting::textureArray, &Painting::textureArray),
+    "textureWidth", sol::property(&Painting::textureWidth, &Painting::textureWidth),
+    "textureHeight", sol::property(&Painting::textureHeight, &Painting::textureHeight),
+    "rippleDisplayList", sol::property(&Painting::rippleDisplayList, &Painting::rippleDisplayList),
+    "rippleTrigger", sol::property(&Painting::rippleTrigger, &Painting::rippleTrigger),
+    "alpha", sol::property(&Painting::alpha, &Painting::alpha),
+    "marioWasUnder", sol::property(&Painting::marioWasUnder, &Painting::marioWasUnder),
+    "marioIsUnder", sol::property(&Painting::marioIsUnder, &Painting::marioIsUnder),
+    "marioWentUnder", sol::property(&Painting::marioWentUnder, &Painting::marioWentUnder),
+    "size", sol::property(&Painting::size, &Painting::size)
+);
+
+lua.new_usertype<PaintingMeshVertex>("PaintingMeshVertex",
+    "pos", sol::overload([] (PaintingMeshVertex& s, int i) -> s16 { return s.pos[i]; }, [] (PaintingMeshVertex& s, int i, s16 v) { s.pos[i] = v; }),
+    "norm", sol::overload([] (PaintingMeshVertex& s, int i) -> s8 { return s.norm[i]; }, [] (PaintingMeshVertex& s, int i, s8 v) { s.norm[i] = v; })
+);
+
+lua.new_usertype<AudioListItem>("AudioListItem",
+    "prev", sol::property(&AudioListItem::prev, &AudioListItem::prev),
+    "next", sol::property(&AudioListItem::next, &AudioListItem::next),
+    "value", sol::overload([] (AudioListItem& s) -> void* { return s.u.value; }, [] (AudioListItem& s, void* v) { s.u.value = v; }),
+    "count", sol::overload([] (AudioListItem& s) -> s32 { return s.u.count; }, [] (AudioListItem& s, s32 v) { s.u.count = v; }),
+    "pool", sol::property(&AudioListItem::pool, &AudioListItem::pool)
+);
+
+lua.new_usertype<NotePool>("NotePool",
+    "disabled", sol::property(&NotePool::disabled, &NotePool::disabled),
+    "decaying", sol::property(&NotePool::decaying, &NotePool::decaying),
+    "releasing", sol::property(&NotePool::releasing, &NotePool::releasing),
+    "active", sol::property(&NotePool::active, &NotePool::active)
+);
+
+lua.new_usertype<VibratoState>("VibratoState",
+    "seqChannel", sol::property(&VibratoState::seqChannel, &VibratoState::seqChannel),
+    "time", sol::property(&VibratoState::time, &VibratoState::time),
+    "curve", sol::property(&VibratoState::curve, &VibratoState::curve),
+    "extent", sol::property(&VibratoState::extent, &VibratoState::extent),
+    "rate", sol::property(&VibratoState::rate, &VibratoState::rate),
+    "active", sol::property(&VibratoState::active, &VibratoState::active),
+    "curve", sol::property(&VibratoState::curve, &VibratoState::curve),
+    "active", sol::property(&VibratoState::active, &VibratoState::active),
+    "rate", sol::property(&VibratoState::rate, &VibratoState::rate),
+    "extent", sol::property(&VibratoState::extent, &VibratoState::extent),
+    "rateChangeTimer", sol::property(&VibratoState::rateChangeTimer, &VibratoState::rateChangeTimer),
+    "extentChangeTimer", sol::property(&VibratoState::extentChangeTimer, &VibratoState::extentChangeTimer),
+    "delay", sol::property(&VibratoState::delay, &VibratoState::delay)
+);
+
+lua.new_usertype<Portamento>("Portamento",
+    "mode", sol::property(&Portamento::mode, &Portamento::mode),
+    "cur", sol::property(&Portamento::cur, &Portamento::cur),
+    "speed", sol::property(&Portamento::speed, &Portamento::speed),
+    "extent", sol::property(&Portamento::extent, &Portamento::extent)
+);
+
+lua.new_usertype<AdsrEnvelope>("AdsrEnvelope",
+    "delay", sol::property(&AdsrEnvelope::delay, &AdsrEnvelope::delay),
+    "arg", sol::property(&AdsrEnvelope::arg, &AdsrEnvelope::arg)
+);
+
+lua.new_usertype<AdpcmLoop>("AdpcmLoop",
+    "start", sol::property(&AdpcmLoop::start, &AdpcmLoop::start),
+    "end", sol::property(&AdpcmLoop::end, &AdpcmLoop::end),
+    "count", sol::property(&AdpcmLoop::count, &AdpcmLoop::count),
+    "pad", sol::property(&AdpcmLoop::pad, &AdpcmLoop::pad),
+    "state", sol::property(&AdpcmLoop::state, &AdpcmLoop::state)
+);
+
+lua.new_usertype<AdpcmBook>("AdpcmBook",
+    "order", sol::property(&AdpcmBook::order, &AdpcmBook::order),
+    "npredictors", sol::property(&AdpcmBook::npredictors, &AdpcmBook::npredictors),
+    "book", sol::property(&AdpcmBook::book, &AdpcmBook::book)
+);
+
+lua.new_usertype<AudioBankSample>("AudioBankSample",
+    "unused", sol::property(&AudioBankSample::unused, &AudioBankSample::unused),
+    "loaded", sol::property(&AudioBankSample::loaded, &AudioBankSample::loaded),
+    "sampleAddr", sol::property(&AudioBankSample::sampleAddr, &AudioBankSample::sampleAddr),
+    "loop", sol::property(&AudioBankSample::loop, &AudioBankSample::loop),
+    "book", sol::property(&AudioBankSample::book, &AudioBankSample::book),
+    "sampleSize", sol::property(&AudioBankSample::sampleSize, &AudioBankSample::sampleSize)
+);
+
+lua.new_usertype<AudioBankSound>("AudioBankSound",
+    "sample", sol::property(&AudioBankSound::sample, &AudioBankSound::sample),
+    "tuning", sol::property(&AudioBankSound::tuning, &AudioBankSound::tuning)
+);
+
+lua.new_usertype<Instrument>("Instrument",
+    "loaded", sol::property(&Instrument::loaded, &Instrument::loaded),
+    "normalRangeLo", sol::property(&Instrument::normalRangeLo, &Instrument::normalRangeLo),
+    "normalRangeHi", sol::property(&Instrument::normalRangeHi, &Instrument::normalRangeHi),
+    "releaseRate", sol::property(&Instrument::releaseRate, &Instrument::releaseRate),
+    "envelope", sol::property(&Instrument::envelope, &Instrument::envelope),
+    "lowNotesSound", sol::property(&Instrument::lowNotesSound, &Instrument::lowNotesSound),
+    "normalNotesSound", sol::property(&Instrument::normalNotesSound, &Instrument::normalNotesSound),
+    "highNotesSound", sol::property(&Instrument::highNotesSound, &Instrument::highNotesSound)
+);
+
+lua.new_usertype<Drum>("Drum",
+    "releaseRate", sol::property(&Drum::releaseRate, &Drum::releaseRate),
+    "pan", sol::property(&Drum::pan, &Drum::pan),
+    "loaded", sol::property(&Drum::loaded, &Drum::loaded),
+    "sound", sol::property(&Drum::sound, &Drum::sound),
+    "envelope", sol::property(&Drum::envelope, &Drum::envelope)
+);
+
+lua.new_usertype<AudioBank>("AudioBank",
+    "drums", sol::property(&AudioBank::drums, &AudioBank::drums),
+    "instruments", sol::property(&AudioBank::instruments, &AudioBank::instruments)
+);
+
+lua.new_usertype<CtlEntry>("CtlEntry",
+    "bankId", sol::property(&CtlEntry::bankId, &CtlEntry::bankId),
+    "numInstruments", sol::property(&CtlEntry::numInstruments, &CtlEntry::numInstruments),
+    "numDrums", sol::property(&CtlEntry::numDrums, &CtlEntry::numDrums),
+    "instruments", sol::property(&CtlEntry::instruments, &CtlEntry::instruments),
+    "drums", sol::property(&CtlEntry::drums, &CtlEntry::drums)
+);
+
+lua.new_usertype<AudioSequenceData>("AudioSequenceData",
+    "bankCount", sol::property(&AudioSequenceData::bankCount, &AudioSequenceData::bankCount),
+    "banks", sol::property(&AudioSequenceData::banks, &AudioSequenceData::banks),
+    "data", sol::property(&AudioSequenceData::data, &AudioSequenceData::data),
+    "id", sol::property(&AudioSequenceData::id, &AudioSequenceData::id)
+);
+
+lua.new_usertype<M64ScriptState>("M64ScriptState",
+    "pc", sol::property(&M64ScriptState::pc, &M64ScriptState::pc),
+    "stack", sol::overload([] (M64ScriptState& s, int i) -> u8* { return s.stack[i]; }, [] (M64ScriptState& s, int i, u8* v) { s.stack[i] = v; }),
+    "remLoopIters", sol::overload([] (M64ScriptState& s, int i) -> u8 { return s.remLoopIters[i]; }, [] (M64ScriptState& s, int i, u8 v) { s.remLoopIters[i] = v; }),
+    "depth", sol::property(&M64ScriptState::depth, &M64ScriptState::depth)
+);
+
+lua.new_usertype<SequencePlayer>("SequencePlayer",
+    "enabled", sol::overload([] (SequencePlayer& s) -> u8 { return s.enabled; }, [] (SequencePlayer& s, u8 v) { s.enabled = v; }),
+    "finished", sol::overload([] (SequencePlayer& s) -> u8 { return s.finished; }, [] (SequencePlayer& s, u8 v) { s.finished = v; }),
+    "muted", sol::overload([] (SequencePlayer& s) -> u8 { return s.muted; }, [] (SequencePlayer& s, u8 v) { s.muted = v; }),
+    "seqDmaInProgress", sol::overload([] (SequencePlayer& s) -> u8 { return s.seqDmaInProgress; }, [] (SequencePlayer& s, u8 v) { s.seqDmaInProgress = v; }),
+    "bankDmaInProgress", sol::overload([] (SequencePlayer& s) -> u8 { return s.bankDmaInProgress; }, [] (SequencePlayer& s, u8 v) { s.bankDmaInProgress = v; }),
+    "seqVariation", sol::property(&SequencePlayer::seqVariation, &SequencePlayer::seqVariation),
+    "state", sol::property(&SequencePlayer::state, &SequencePlayer::state),
+    "noteAllocPolicy", sol::property(&SequencePlayer::noteAllocPolicy, &SequencePlayer::noteAllocPolicy),
+    "muteBehavior", sol::property(&SequencePlayer::muteBehavior, &SequencePlayer::muteBehavior),
+    "seqId", sol::property(&SequencePlayer::seqId, &SequencePlayer::seqId),
+    "defaultBank", sol::overload([] (SequencePlayer& s, int i) -> u8 { return s.defaultBank[i]; }, [] (SequencePlayer& s, int i, u8 v) { s.defaultBank[i] = v; }),
+    "loadingBankId", sol::property(&SequencePlayer::loadingBankId, &SequencePlayer::loadingBankId),
+    "loadingBankNumInstruments", sol::property(&SequencePlayer::loadingBankNumInstruments, &SequencePlayer::loadingBankNumInstruments),
+    "loadingBankNumDrums", sol::property(&SequencePlayer::loadingBankNumDrums, &SequencePlayer::loadingBankNumDrums),
+    "tempo", sol::property(&SequencePlayer::tempo, &SequencePlayer::tempo),
+    "tempoAcc", sol::property(&SequencePlayer::tempoAcc, &SequencePlayer::tempoAcc),
+    "fadeRemainingFrames", sol::property(&SequencePlayer::fadeRemainingFrames, &SequencePlayer::fadeRemainingFrames),
+    "transposition", sol::property(&SequencePlayer::transposition, &SequencePlayer::transposition),
+    "delay", sol::property(&SequencePlayer::delay, &SequencePlayer::delay),
+    "seqData", sol::property(&SequencePlayer::seqData, &SequencePlayer::seqData),
+    "fadeVolume", sol::property(&SequencePlayer::fadeVolume, &SequencePlayer::fadeVolume),
+    "fadeVelocity", sol::property(&SequencePlayer::fadeVelocity, &SequencePlayer::fadeVelocity),
+    "volume", sol::property(&SequencePlayer::volume, &SequencePlayer::volume),
+    "muteVolumeScale", sol::property(&SequencePlayer::muteVolumeScale, &SequencePlayer::muteVolumeScale),
+    "channels", sol::overload([] (SequencePlayer& s, int i) -> struct SequenceChannel* { return s.channels[i]; }, [] (SequencePlayer& s, int i, struct SequenceChannel* v) { s.channels[i] = v; }),
+    "scriptState", sol::property(&SequencePlayer::scriptState, &SequencePlayer::scriptState),
+    "shortNoteVelocityTable", sol::property(&SequencePlayer::shortNoteVelocityTable, &SequencePlayer::shortNoteVelocityTable),
+    "shortNoteDurationTable", sol::property(&SequencePlayer::shortNoteDurationTable, &SequencePlayer::shortNoteDurationTable),
+    "notePool", sol::property(&SequencePlayer::notePool, &SequencePlayer::notePool),
+    "seqDmaMesgQueue", sol::property(&SequencePlayer::seqDmaMesgQueue, &SequencePlayer::seqDmaMesgQueue),
+    "seqDmaMesg", sol::property(&SequencePlayer::seqDmaMesg, &SequencePlayer::seqDmaMesg),
+    "seqDmaIoMesg", sol::property(&SequencePlayer::seqDmaIoMesg, &SequencePlayer::seqDmaIoMesg),
+    "bankDmaMesgQueue", sol::property(&SequencePlayer::bankDmaMesgQueue, &SequencePlayer::bankDmaMesgQueue),
+    "bankDmaMesg", sol::property(&SequencePlayer::bankDmaMesg, &SequencePlayer::bankDmaMesg),
+    "bankDmaIoMesg", sol::property(&SequencePlayer::bankDmaIoMesg, &SequencePlayer::bankDmaIoMesg),
+    "bankDmaCurrMemAddr", sol::property(&SequencePlayer::bankDmaCurrMemAddr, &SequencePlayer::bankDmaCurrMemAddr),
+    "loadingBank", sol::property(&SequencePlayer::loadingBank, &SequencePlayer::loadingBank),
+    "bankDmaCurrDevAddr", sol::property(&SequencePlayer::bankDmaCurrDevAddr, &SequencePlayer::bankDmaCurrDevAddr),
+    "bankDmaRemaining", sol::property(&SequencePlayer::bankDmaRemaining, &SequencePlayer::bankDmaRemaining),
+    "gameVolume", sol::property(&SequencePlayer::gameVolume, &SequencePlayer::gameVolume)
+);
+
+lua.new_usertype<AdsrSettings>("AdsrSettings",
+    "releaseRate", sol::property(&AdsrSettings::releaseRate, &AdsrSettings::releaseRate),
+    "sustain", sol::property(&AdsrSettings::sustain, &AdsrSettings::sustain),
+    "envelope", sol::property(&AdsrSettings::envelope, &AdsrSettings::envelope)
+);
+
+lua.new_usertype<AdsrState>("AdsrState",
+    "action", sol::property(&AdsrState::action, &AdsrState::action),
+    "state", sol::property(&AdsrState::state, &AdsrState::state),
+    "initial", sol::property(&AdsrState::initial, &AdsrState::initial),
+    "target", sol::property(&AdsrState::target, &AdsrState::target),
+    "current", sol::property(&AdsrState::current, &AdsrState::current),
+    "envIndex", sol::property(&AdsrState::envIndex, &AdsrState::envIndex),
+    "delay", sol::property(&AdsrState::delay, &AdsrState::delay),
+    "sustain", sol::property(&AdsrState::sustain, &AdsrState::sustain),
+    "fadeOutVel", sol::property(&AdsrState::fadeOutVel, &AdsrState::fadeOutVel),
+    "velocity", sol::property(&AdsrState::velocity, &AdsrState::velocity),
+    "currentHiRes", sol::property(&AdsrState::currentHiRes, &AdsrState::currentHiRes),
+    "volOut", sol::property(&AdsrState::volOut, &AdsrState::volOut),
+    "envelope", sol::property(&AdsrState::envelope, &AdsrState::envelope)
+);
+
+lua.new_usertype<ReverbBitsData>("ReverbBitsData",
+    "bit0", sol::overload([] (ReverbBitsData& s) -> u8 { return s.bit0; }, [] (ReverbBitsData& s, u8 v) { s.bit0 = v; }),
+    "bit1", sol::overload([] (ReverbBitsData& s) -> u8 { return s.bit1; }, [] (ReverbBitsData& s, u8 v) { s.bit1 = v; }),
+    "bit2", sol::overload([] (ReverbBitsData& s) -> u8 { return s.bit2; }, [] (ReverbBitsData& s, u8 v) { s.bit2 = v; }),
+    "usesHeadsetPanEffects", sol::overload([] (ReverbBitsData& s) -> u8 { return s.usesHeadsetPanEffects; }, [] (ReverbBitsData& s, u8 v) { s.usesHeadsetPanEffects = v; }),
+    "stereoHeadsetEffects", sol::overload([] (ReverbBitsData& s) -> u8 { return s.stereoHeadsetEffects; }, [] (ReverbBitsData& s, u8 v) { s.stereoHeadsetEffects = v; }),
+    "strongRight", sol::overload([] (ReverbBitsData& s) -> u8 { return s.strongRight; }, [] (ReverbBitsData& s, u8 v) { s.strongRight = v; }),
+    "strongLeft", sol::overload([] (ReverbBitsData& s) -> u8 { return s.strongLeft; }, [] (ReverbBitsData& s, u8 v) { s.strongLeft = v; })
+);
+
+lua.new_usertype<ReverbInfo>("ReverbInfo",
+    "reverbVol", sol::property(&ReverbInfo::reverbVol, &ReverbInfo::reverbVol),
+    "synthesisVolume", sol::property(&ReverbInfo::synthesisVolume, &ReverbInfo::synthesisVolume),
+    "pan", sol::property(&ReverbInfo::pan, &ReverbInfo::pan),
+    "reverbBits", sol::property(&ReverbInfo::reverbBits, &ReverbInfo::reverbBits),
+    "freqScale", sol::property(&ReverbInfo::freqScale, &ReverbInfo::freqScale),
+    "velocity", sol::property(&ReverbInfo::velocity, &ReverbInfo::velocity),
+    "unused", sol::property(&ReverbInfo::unused, &ReverbInfo::unused),
+    "filter", sol::property(&ReverbInfo::filter, &ReverbInfo::filter)
+);
+
+lua.new_usertype<NoteAttributes>("NoteAttributes",
+    "reverbVol", sol::property(&NoteAttributes::reverbVol, &NoteAttributes::reverbVol),
+    "freqScale", sol::property(&NoteAttributes::freqScale, &NoteAttributes::freqScale),
+    "velocity", sol::property(&NoteAttributes::velocity, &NoteAttributes::velocity),
+    "pan", sol::property(&NoteAttributes::pan, &NoteAttributes::pan)
+);
+
+lua.new_usertype<SequenceChannel>("SequenceChannel",
+    "enabled", sol::overload([] (SequenceChannel& s) -> u8 { return s.enabled; }, [] (SequenceChannel& s, u8 v) { s.enabled = v; }),
+    "finished", sol::overload([] (SequenceChannel& s) -> u8 { return s.finished; }, [] (SequenceChannel& s, u8 v) { s.finished = v; }),
+    "stopScript", sol::overload([] (SequenceChannel& s) -> u8 { return s.stopScript; }, [] (SequenceChannel& s, u8 v) { s.stopScript = v; }),
+    "stopSomething2", sol::overload([] (SequenceChannel& s) -> u8 { return s.stopSomething2; }, [] (SequenceChannel& s, u8 v) { s.stopSomething2 = v; }),
+    "hasInstrument", sol::overload([] (SequenceChannel& s) -> u8 { return s.hasInstrument; }, [] (SequenceChannel& s, u8 v) { s.hasInstrument = v; }),
+    "stereoHeadsetEffects", sol::overload([] (SequenceChannel& s) -> u8 { return s.stereoHeadsetEffects; }, [] (SequenceChannel& s, u8 v) { s.stereoHeadsetEffects = v; }),
+    "largeNotes", sol::overload([] (SequenceChannel& s) -> u8 { return s.largeNotes; }, [] (SequenceChannel& s, u8 v) { s.largeNotes = v; }),
+    "unused", sol::overload([] (SequenceChannel& s) -> u8 { return s.unused; }, [] (SequenceChannel& s, u8 v) { s.unused = v; }),
+    "noteAllocPolicy", sol::property(&SequenceChannel::noteAllocPolicy, &SequenceChannel::noteAllocPolicy),
+    "muteBehavior", sol::property(&SequenceChannel::muteBehavior, &SequenceChannel::muteBehavior),
+    "reverbVol", sol::property(&SequenceChannel::reverbVol, &SequenceChannel::reverbVol),
+    "notePriority", sol::property(&SequenceChannel::notePriority, &SequenceChannel::notePriority),
+    "bankId", sol::property(&SequenceChannel::bankId, &SequenceChannel::bankId),
+    "surroundEffectIndex", sol::property(&SequenceChannel::surroundEffectIndex, &SequenceChannel::surroundEffectIndex),
+    "combFilterSize", sol::property(&SequenceChannel::combFilterSize, &SequenceChannel::combFilterSize),
+    "combFilterGain", sol::property(&SequenceChannel::combFilterGain, &SequenceChannel::combFilterGain),
+    "updatesPerFrameUnused", sol::property(&SequenceChannel::updatesPerFrameUnused, &SequenceChannel::updatesPerFrameUnused),
+    "vibratoRateStart", sol::property(&SequenceChannel::vibratoRateStart, &SequenceChannel::vibratoRateStart),
+    "vibratoExtentStart", sol::property(&SequenceChannel::vibratoExtentStart, &SequenceChannel::vibratoExtentStart),
+    "vibratoRateTarget", sol::property(&SequenceChannel::vibratoRateTarget, &SequenceChannel::vibratoRateTarget),
+    "vibratoExtentTarget", sol::property(&SequenceChannel::vibratoExtentTarget, &SequenceChannel::vibratoExtentTarget),
+    "vibratoRateChangeDelay", sol::property(&SequenceChannel::vibratoRateChangeDelay, &SequenceChannel::vibratoRateChangeDelay),
+    "vibratoExtentChangeDelay", sol::property(&SequenceChannel::vibratoExtentChangeDelay, &SequenceChannel::vibratoExtentChangeDelay),
+    "vibratoDelay", sol::property(&SequenceChannel::vibratoDelay, &SequenceChannel::vibratoDelay),
+    "delay", sol::property(&SequenceChannel::delay, &SequenceChannel::delay),
+    "instOrWave", sol::property(&SequenceChannel::instOrWave, &SequenceChannel::instOrWave),
+    "transposition", sol::property(&SequenceChannel::transposition, &SequenceChannel::transposition),
+    "volumeScale", sol::property(&SequenceChannel::volumeScale, &SequenceChannel::volumeScale),
+    "volume", sol::property(&SequenceChannel::volume, &SequenceChannel::volume),
+    "pan", sol::property(&SequenceChannel::pan, &SequenceChannel::pan),
+    "panChannelWeight", sol::property(&SequenceChannel::panChannelWeight, &SequenceChannel::panChannelWeight),
+    "freqScale", sol::property(&SequenceChannel::freqScale, &SequenceChannel::freqScale),
+    "dynTable", sol::property(&SequenceChannel::dynTable, &SequenceChannel::dynTable),
+    "noteUnused", sol::property(&SequenceChannel::noteUnused, &SequenceChannel::noteUnused),
+    "layerUnused", sol::property(&SequenceChannel::layerUnused, &SequenceChannel::layerUnused),
+    "instrument", sol::property(&SequenceChannel::instrument, &SequenceChannel::instrument),
+    "seqPlayer", sol::property(&SequenceChannel::seqPlayer, &SequenceChannel::seqPlayer),
+    "layers", sol::overload([] (SequenceChannel& s, int i) -> struct SequenceChannelLayer* { return s.layers[i]; }, [] (SequenceChannel& s, int i, struct SequenceChannelLayer* v) { s.layers[i] = v; }),
+    "soundScriptIO", sol::overload([] (SequenceChannel& s, int i) -> s8 { return s.soundScriptIO[i]; }, [] (SequenceChannel& s, int i, s8 v) { s.soundScriptIO[i] = v; }),
+    "scriptState", sol::property(&SequenceChannel::scriptState, &SequenceChannel::scriptState),
+    "adsr", sol::property(&SequenceChannel::adsr, &SequenceChannel::adsr),
+    "notePool", sol::property(&SequenceChannel::notePool, &SequenceChannel::notePool)
+);
+
+lua.new_usertype<SequenceChannelLayer>("SequenceChannelLayer",
+    "enabled", sol::overload([] (SequenceChannelLayer& s) -> u8 { return s.enabled; }, [] (SequenceChannelLayer& s, u8 v) { s.enabled = v; }),
+    "finished", sol::overload([] (SequenceChannelLayer& s) -> u8 { return s.finished; }, [] (SequenceChannelLayer& s, u8 v) { s.finished = v; }),
+    "stopSomething", sol::overload([] (SequenceChannelLayer& s) -> u8 { return s.stopSomething; }, [] (SequenceChannelLayer& s, u8 v) { s.stopSomething = v; }),
+    "continuousNotes", sol::overload([] (SequenceChannelLayer& s) -> u8 { return s.continuousNotes; }, [] (SequenceChannelLayer& s, u8 v) { s.continuousNotes = v; }),
+    "status", sol::property(&SequenceChannelLayer::status, &SequenceChannelLayer::status),
+    "noteDuration", sol::property(&SequenceChannelLayer::noteDuration, &SequenceChannelLayer::noteDuration),
+    "portamentoTargetNote", sol::property(&SequenceChannelLayer::portamentoTargetNote, &SequenceChannelLayer::portamentoTargetNote),
+    "portamento", sol::property(&SequenceChannelLayer::portamento, &SequenceChannelLayer::portamento),
+    "adsr", sol::property(&SequenceChannelLayer::adsr, &SequenceChannelLayer::adsr),
+    "portamentoTime", sol::property(&SequenceChannelLayer::portamentoTime, &SequenceChannelLayer::portamentoTime),
+    "transposition", sol::property(&SequenceChannelLayer::transposition, &SequenceChannelLayer::transposition),
+    "freqScale", sol::property(&SequenceChannelLayer::freqScale, &SequenceChannelLayer::freqScale),
+    "velocitySquare", sol::property(&SequenceChannelLayer::velocitySquare, &SequenceChannelLayer::velocitySquare),
+    "pan", sol::property(&SequenceChannelLayer::pan, &SequenceChannelLayer::pan),
+    "noteVelocity", sol::property(&SequenceChannelLayer::noteVelocity, &SequenceChannelLayer::noteVelocity),
+    "notePan", sol::property(&SequenceChannelLayer::notePan, &SequenceChannelLayer::notePan),
+    "noteFreqScale", sol::property(&SequenceChannelLayer::noteFreqScale, &SequenceChannelLayer::noteFreqScale),
+    "shortNoteDefaultPlayPercentage", sol::property(&SequenceChannelLayer::shortNoteDefaultPlayPercentage, &SequenceChannelLayer::shortNoteDefaultPlayPercentage),
+    "playPercentage", sol::property(&SequenceChannelLayer::playPercentage, &SequenceChannelLayer::playPercentage),
+    "delay", sol::property(&SequenceChannelLayer::delay, &SequenceChannelLayer::delay),
+    "duration", sol::property(&SequenceChannelLayer::duration, &SequenceChannelLayer::duration),
+    "delayUnused", sol::property(&SequenceChannelLayer::delayUnused, &SequenceChannelLayer::delayUnused),
+    "note", sol::property(&SequenceChannelLayer::note, &SequenceChannelLayer::note),
+    "instrument", sol::property(&SequenceChannelLayer::instrument, &SequenceChannelLayer::instrument),
+    "sound", sol::property(&SequenceChannelLayer::sound, &SequenceChannelLayer::sound),
+    "seqChannel", sol::property(&SequenceChannelLayer::seqChannel, &SequenceChannelLayer::seqChannel),
+    "scriptState", sol::property(&SequenceChannelLayer::scriptState, &SequenceChannelLayer::scriptState),
+    "listItem", sol::property(&SequenceChannelLayer::listItem, &SequenceChannelLayer::listItem)
+);
+
+lua.new_usertype<vNote>("vNote",
+    "enabled", sol::overload([] (vNote& s) -> u8 { return s.enabled; }, [] (vNote& s, u8 v) { s.enabled = v; }),
+    "force_structure_alignment", sol::property(&vNote::force_structure_alignment, &vNote::force_structure_alignment)
+);
+
+lua.new_usertype<NoteSynthesisBuffers>("NoteSynthesisBuffers",
+    "adpcmdecState", sol::overload([] (NoteSynthesisBuffers& s, int i) -> s16 { return s.adpcmdecState[i]; }, [] (NoteSynthesisBuffers& s, int i, s16 v) { s.adpcmdecState[i] = v; }),
+    "finalResampleState", sol::overload([] (NoteSynthesisBuffers& s, int i) -> s16 { return s.finalResampleState[i]; }, [] (NoteSynthesisBuffers& s, int i, s16 v) { s.finalResampleState[i] = v; }),
+    "mixEnvelopeState", sol::overload([] (NoteSynthesisBuffers& s, int i) -> s16 { return s.mixEnvelopeState[i]; }, [] (NoteSynthesisBuffers& s, int i, s16 v) { s.mixEnvelopeState[i] = v; }),
+    "panResampleState", sol::overload([] (NoteSynthesisBuffers& s, int i) -> s16 { return s.panResampleState[i]; }, [] (NoteSynthesisBuffers& s, int i, s16 v) { s.panResampleState[i] = v; }),
+    "panSamplesBuffer", sol::overload([] (NoteSynthesisBuffers& s, int i) -> s16 { return s.panSamplesBuffer[i]; }, [] (NoteSynthesisBuffers& s, int i, s16 v) { s.panSamplesBuffer[i] = v; }),
+    "dummyResampleState", sol::overload([] (NoteSynthesisBuffers& s, int i) -> s16 { return s.dummyResampleState[i]; }, [] (NoteSynthesisBuffers& s, int i, s16 v) { s.dummyResampleState[i] = v; }),
+    "samples", sol::overload([] (NoteSynthesisBuffers& s, int i) -> s16 { return s.samples[i]; }, [] (NoteSynthesisBuffers& s, int i, s16 v) { s.samples[i] = v; }),
+    "combFilterState", sol::overload([] (NoteSynthesisBuffers& s, int i) -> s16 { return s.combFilterState[i]; }, [] (NoteSynthesisBuffers& s, int i, s16 v) { s.combFilterState[i] = v; })
+);
+
+lua.new_usertype<ReverbSettingsEU>("ReverbSettingsEU",
+    "downsampleRate", sol::property(&ReverbSettingsEU::downsampleRate, &ReverbSettingsEU::downsampleRate),
+    "windowSize", sol::property(&ReverbSettingsEU::windowSize, &ReverbSettingsEU::windowSize),
+    "gain", sol::property(&ReverbSettingsEU::gain, &ReverbSettingsEU::gain),
+    "unk4", sol::property(&ReverbSettingsEU::unk4, &ReverbSettingsEU::unk4),
+    "unk6", sol::property(&ReverbSettingsEU::unk6, &ReverbSettingsEU::unk6),
+    "unk8", sol::property(&ReverbSettingsEU::unk8, &ReverbSettingsEU::unk8),
+    "unkA", sol::property(&ReverbSettingsEU::unkA, &ReverbSettingsEU::unkA),
+    "unkC", sol::property(&ReverbSettingsEU::unkC, &ReverbSettingsEU::unkC),
+    "unkE", sol::property(&ReverbSettingsEU::unkE, &ReverbSettingsEU::unkE)
+);
+
+lua.new_usertype<AudioSessionSettingsEU>("AudioSessionSettingsEU",
+    "frequency", sol::property(&AudioSessionSettingsEU::frequency, &AudioSessionSettingsEU::frequency),
+    "unk1", sol::property(&AudioSessionSettingsEU::unk1, &AudioSessionSettingsEU::unk1),
+    "maxSimultaneousNotes", sol::property(&AudioSessionSettingsEU::maxSimultaneousNotes, &AudioSessionSettingsEU::maxSimultaneousNotes),
+    "numReverbs", sol::property(&AudioSessionSettingsEU::numReverbs, &AudioSessionSettingsEU::numReverbs),
+    "unk2", sol::property(&AudioSessionSettingsEU::unk2, &AudioSessionSettingsEU::unk2),
+    "reverbSettings", sol::property(&AudioSessionSettingsEU::reverbSettings, &AudioSessionSettingsEU::reverbSettings),
+    "volume", sol::property(&AudioSessionSettingsEU::volume, &AudioSessionSettingsEU::volume),
+    "unk3", sol::property(&AudioSessionSettingsEU::unk3, &AudioSessionSettingsEU::unk3),
+    "persistentSeqMem", sol::property(&AudioSessionSettingsEU::persistentSeqMem, &AudioSessionSettingsEU::persistentSeqMem),
+    "persistentBankMem", sol::property(&AudioSessionSettingsEU::persistentBankMem, &AudioSessionSettingsEU::persistentBankMem),
+    "temporarySeqMem", sol::property(&AudioSessionSettingsEU::temporarySeqMem, &AudioSessionSettingsEU::temporarySeqMem),
+    "temporaryBankMem", sol::property(&AudioSessionSettingsEU::temporaryBankMem, &AudioSessionSettingsEU::temporaryBankMem)
+);
+
+lua.new_usertype<AudioSessionSettings>("AudioSessionSettings",
+    "frequency", sol::property(&AudioSessionSettings::frequency, &AudioSessionSettings::frequency),
+    "maxSimultaneousNotes", sol::property(&AudioSessionSettings::maxSimultaneousNotes, &AudioSessionSettings::maxSimultaneousNotes),
+    "reverbDownsampleRate", sol::property(&AudioSessionSettings::reverbDownsampleRate, &AudioSessionSettings::reverbDownsampleRate),
+    "reverbWindowSize", sol::property(&AudioSessionSettings::reverbWindowSize, &AudioSessionSettings::reverbWindowSize),
+    "reverbGain", sol::property(&AudioSessionSettings::reverbGain, &AudioSessionSettings::reverbGain),
+    "volume", sol::property(&AudioSessionSettings::volume, &AudioSessionSettings::volume),
+    "persistentSeqMem", sol::property(&AudioSessionSettings::persistentSeqMem, &AudioSessionSettings::persistentSeqMem),
+    "persistentBankMem", sol::property(&AudioSessionSettings::persistentBankMem, &AudioSessionSettings::persistentBankMem),
+    "temporarySeqMem", sol::property(&AudioSessionSettings::temporarySeqMem, &AudioSessionSettings::temporarySeqMem),
+    "temporaryBankMem", sol::property(&AudioSessionSettings::temporaryBankMem, &AudioSessionSettings::temporaryBankMem)
+);
+
+lua.new_usertype<AudioBufferParametersEU>("AudioBufferParametersEU",
+    "presetUnk4", sol::property(&AudioBufferParametersEU::presetUnk4, &AudioBufferParametersEU::presetUnk4),
+    "frequency", sol::property(&AudioBufferParametersEU::frequency, &AudioBufferParametersEU::frequency),
+    "aiFrequency", sol::property(&AudioBufferParametersEU::aiFrequency, &AudioBufferParametersEU::aiFrequency),
+    "samplesPerFrameTarget", sol::property(&AudioBufferParametersEU::samplesPerFrameTarget, &AudioBufferParametersEU::samplesPerFrameTarget),
+    "maxAiBufferLength", sol::property(&AudioBufferParametersEU::maxAiBufferLength, &AudioBufferParametersEU::maxAiBufferLength),
+    "minAiBufferLength", sol::property(&AudioBufferParametersEU::minAiBufferLength, &AudioBufferParametersEU::minAiBufferLength),
+    "updatesPerFrame", sol::property(&AudioBufferParametersEU::updatesPerFrame, &AudioBufferParametersEU::updatesPerFrame),
+    "samplesPerUpdate", sol::property(&AudioBufferParametersEU::samplesPerUpdate, &AudioBufferParametersEU::samplesPerUpdate),
+    "samplesPerUpdateMax", sol::property(&AudioBufferParametersEU::samplesPerUpdateMax, &AudioBufferParametersEU::samplesPerUpdateMax),
+    "samplesPerUpdateMin", sol::property(&AudioBufferParametersEU::samplesPerUpdateMin, &AudioBufferParametersEU::samplesPerUpdateMin),
+    "resampleRate", sol::property(&AudioBufferParametersEU::resampleRate, &AudioBufferParametersEU::resampleRate),
+    "updatesPerFrameInv", sol::property(&AudioBufferParametersEU::updatesPerFrameInv, &AudioBufferParametersEU::updatesPerFrameInv),
+    "unkUpdatesPerFrameScaled", sol::property(&AudioBufferParametersEU::unkUpdatesPerFrameScaled, &AudioBufferParametersEU::unkUpdatesPerFrameScaled)
+);
+
+lua.new_usertype<ReverbRingBufferItem>("ReverbRingBufferItem",
+    "numSamplesAfterDownsampling", sol::property(&ReverbRingBufferItem::numSamplesAfterDownsampling, &ReverbRingBufferItem::numSamplesAfterDownsampling),
+    "chunkLen", sol::property(&ReverbRingBufferItem::chunkLen, &ReverbRingBufferItem::chunkLen),
+    "toDownsampleLeft", sol::property(&ReverbRingBufferItem::toDownsampleLeft, &ReverbRingBufferItem::toDownsampleLeft),
+    "toDownsampleRight", sol::property(&ReverbRingBufferItem::toDownsampleRight, &ReverbRingBufferItem::toDownsampleRight),
+    "startPos", sol::property(&ReverbRingBufferItem::startPos, &ReverbRingBufferItem::startPos),
+    "lengthA", sol::property(&ReverbRingBufferItem::lengthA, &ReverbRingBufferItem::lengthA),
+    "lengthB", sol::property(&ReverbRingBufferItem::lengthB, &ReverbRingBufferItem::lengthB)
+);
+
+lua.new_usertype<SynthesisReverb>("SynthesisReverb",
+    "resampleFlags", sol::property(&SynthesisReverb::resampleFlags, &SynthesisReverb::resampleFlags),
+    "useReverb", sol::property(&SynthesisReverb::useReverb, &SynthesisReverb::useReverb),
+    "framesLeftToIgnore", sol::property(&SynthesisReverb::framesLeftToIgnore, &SynthesisReverb::framesLeftToIgnore),
+    "curFrame", sol::property(&SynthesisReverb::curFrame, &SynthesisReverb::curFrame),
+    "reverbGain", sol::property(&SynthesisReverb::reverbGain, &SynthesisReverb::reverbGain),
+    "resampleRate", sol::property(&SynthesisReverb::resampleRate, &SynthesisReverb::resampleRate),
+    "nextRingBufferPos", sol::property(&SynthesisReverb::nextRingBufferPos, &SynthesisReverb::nextRingBufferPos),
+    "unkC", sol::property(&SynthesisReverb::unkC, &SynthesisReverb::unkC),
+    "bufSizePerChannel", sol::property(&SynthesisReverb::bufSizePerChannel, &SynthesisReverb::bufSizePerChannel),
+    "left", sol::overload([] (SynthesisReverb& s) -> s16* { return s.ringBuffer.left; }, [] (SynthesisReverb& s, s16* v) { s.ringBuffer.left = v; }),
+    "right", sol::overload([] (SynthesisReverb& s) -> s16* { return s.ringBuffer.right; }, [] (SynthesisReverb& s, s16* v) { s.ringBuffer.right = v; }),
+    "resampleStateLeft", sol::property(&SynthesisReverb::resampleStateLeft, &SynthesisReverb::resampleStateLeft),
+    "resampleStateRight", sol::property(&SynthesisReverb::resampleStateRight, &SynthesisReverb::resampleStateRight),
+    "unk24", sol::property(&SynthesisReverb::unk24, &SynthesisReverb::unk24),
+    "unk28", sol::property(&SynthesisReverb::unk28, &SynthesisReverb::unk28),
+    "items", sol::overload([] (SynthesisReverb& s, int i, int j) -> struct ReverbRingBufferItem { return s.items[i][j]; }, [] (SynthesisReverb& s, int i, int j, struct ReverbRingBufferItem v) { s.items[i][j] = v; })
+);
+
+lua.new_usertype<SoundAllocPool>("SoundAllocPool",
+    "start", sol::property(&SoundAllocPool::start, &SoundAllocPool::start),
+    "cur", sol::property(&SoundAllocPool::cur, &SoundAllocPool::cur),
+    "size", sol::property(&SoundAllocPool::size, &SoundAllocPool::size),
+    "numAllocatedEntries", sol::property(&SoundAllocPool::numAllocatedEntries, &SoundAllocPool::numAllocatedEntries)
+);
+
+lua.new_usertype<SeqOrBankEntry>("SeqOrBankEntry",
+    "ptr", sol::property(&SeqOrBankEntry::ptr, &SeqOrBankEntry::ptr),
+    "size", sol::property(&SeqOrBankEntry::size, &SeqOrBankEntry::size),
+    "id", sol::property(&SeqOrBankEntry::id, &SeqOrBankEntry::id)
+);
+
+lua.new_usertype<PersistentPool>("PersistentPool",
+    "numEntries", sol::property(&PersistentPool::numEntries, &PersistentPool::numEntries),
+    "pool", sol::property(&PersistentPool::pool, &PersistentPool::pool),
+    "entries", sol::overload([] (PersistentPool& s, int i) -> struct SeqOrBankEntry { return s.entries[i]; }, [] (PersistentPool& s, int i, struct SeqOrBankEntry v) { s.entries[i] = v; })
+);
+
+lua.new_usertype<TemporaryPool>("TemporaryPool",
+    "nextSide", sol::property(&TemporaryPool::nextSide, &TemporaryPool::nextSide),
+    "pool", sol::property(&TemporaryPool::pool, &TemporaryPool::pool),
+    "entries", sol::overload([] (TemporaryPool& s, int i) -> struct SeqOrBankEntry { return s.entries[i]; }, [] (TemporaryPool& s, int i, struct SeqOrBankEntry v) { s.entries[i] = v; })
+);
+
+lua.new_usertype<SoundMultiPool>("SoundMultiPool",
+    "persistent", sol::property(&SoundMultiPool::persistent, &SoundMultiPool::persistent),
+    "temporary", sol::property(&SoundMultiPool::temporary, &SoundMultiPool::temporary),
+    "pad2", sol::overload([] (SoundMultiPool& s, int i) -> u32 { return s.pad2[i]; }, [] (SoundMultiPool& s, int i, u32 v) { s.pad2[i] = v; })
+);
+
+lua.new_usertype<Unk1Pool>("Unk1Pool",
+    "pool", sol::property(&Unk1Pool::pool, &Unk1Pool::pool),
+    "entries", sol::overload([] (Unk1Pool& s, int i) -> struct SeqOrBankEntry { return s.entries[i]; }, [] (Unk1Pool& s, int i, struct SeqOrBankEntry v) { s.entries[i] = v; })
+);
+
+lua.new_usertype<UnkEntry>("UnkEntry",
+    "used", sol::property(&UnkEntry::used, &UnkEntry::used),
+    "medium", sol::property(&UnkEntry::medium, &UnkEntry::medium),
+    "bankId", sol::property(&UnkEntry::bankId, &UnkEntry::bankId),
+    "pad", sol::property(&UnkEntry::pad, &UnkEntry::pad),
+    "srcAddr", sol::property(&UnkEntry::srcAddr, &UnkEntry::srcAddr),
+    "dstAddr", sol::property(&UnkEntry::dstAddr, &UnkEntry::dstAddr),
+    "size", sol::property(&UnkEntry::size, &UnkEntry::size)
+);
+
+lua.new_usertype<UnkPool>("UnkPool",
+    "pool", sol::property(&UnkPool::pool, &UnkPool::pool),
+    "entries", sol::overload([] (UnkPool& s, int i) -> struct UnkEntry { return s.entries[i]; }, [] (UnkPool& s, int i, struct UnkEntry v) { s.entries[i] = v; }),
+    "numEntries", sol::property(&UnkPool::numEntries, &UnkPool::numEntries),
+    "unk514", sol::property(&UnkPool::unk514, &UnkPool::unk514)
+);
+
+lua.new_usertype<FnGraphNode>("FnGraphNode",
+    "node", sol::property(&FnGraphNode::node, &FnGraphNode::node),
+    "func", sol::property(&FnGraphNode::func, &FnGraphNode::func)
+);
+
+lua.new_usertype<GraphNodeRoot>("GraphNodeRoot",
+    "node", sol::property(&GraphNodeRoot::node, &GraphNodeRoot::node),
+    "areaIndex", sol::property(&GraphNodeRoot::areaIndex, &GraphNodeRoot::areaIndex),
+    "unk15", sol::property(&GraphNodeRoot::unk15, &GraphNodeRoot::unk15),
+    "x", sol::property(&GraphNodeRoot::x, &GraphNodeRoot::x),
+    "y", sol::property(&GraphNodeRoot::y, &GraphNodeRoot::y),
+    "width", sol::property(&GraphNodeRoot::width, &GraphNodeRoot::width),
+    "height", sol::property(&GraphNodeRoot::height, &GraphNodeRoot::height),
+    "numViews", sol::property(&GraphNodeRoot::numViews, &GraphNodeRoot::numViews),
+    "views", sol::property(&GraphNodeRoot::views, &GraphNodeRoot::views),
+    "nodeId", sol::property(&GraphNodeRoot::nodeId, &GraphNodeRoot::nodeId)
+);
+
+lua.new_usertype<GraphNodeOrthoProjection>("GraphNodeOrthoProjection",
+    "node", sol::property(&GraphNodeOrthoProjection::node, &GraphNodeOrthoProjection::node),
+    "scale", sol::property(&GraphNodeOrthoProjection::scale, &GraphNodeOrthoProjection::scale)
+);
+
+lua.new_usertype<GraphNodePerspective>("GraphNodePerspective",
+    "fnNode", sol::property(&GraphNodePerspective::fnNode, &GraphNodePerspective::fnNode),
+    "unused", sol::property(&GraphNodePerspective::unused, &GraphNodePerspective::unused),
+    "fov", sol::property(&GraphNodePerspective::fov, &GraphNodePerspective::fov),
+    "near", sol::property(&GraphNodePerspective::near, &GraphNodePerspective::near),
+    "far", sol::property(&GraphNodePerspective::far, &GraphNodePerspective::far),
+    "prevFov", sol::property(&GraphNodePerspective::prevFov, &GraphNodePerspective::prevFov),
+    "prevTimestamp", sol::property(&GraphNodePerspective::prevTimestamp, &GraphNodePerspective::prevTimestamp)
+);
+
+lua.new_usertype<DisplayListNode>("DisplayListNode",
+    "transform", sol::property(&DisplayListNode::transform, &DisplayListNode::transform),
+    "displayList", sol::property(&DisplayListNode::displayList, &DisplayListNode::displayList),
+    "next", sol::property(&DisplayListNode::next, &DisplayListNode::next),
+    "transformMatrix", sol::property(&DisplayListNode::transformMatrix, &DisplayListNode::transformMatrix)
+);
+
+lua.new_usertype<GraphNodeMasterList>("GraphNodeMasterList",
+    "node", sol::property(&GraphNodeMasterList::node, &GraphNodeMasterList::node),
+    "listHeads", sol::overload([] (GraphNodeMasterList& s, int i) -> struct DisplayListNode* { return s.listHeads[i]; }, [] (GraphNodeMasterList& s, int i, struct DisplayListNode* v) { s.listHeads[i] = v; }),
+    "listTails", sol::overload([] (GraphNodeMasterList& s, int i) -> struct DisplayListNode* { return s.listTails[i]; }, [] (GraphNodeMasterList& s, int i, struct DisplayListNode* v) { s.listTails[i] = v; })
+);
+
+lua.new_usertype<GraphNodeStart>("GraphNodeStart",
+    "node", sol::property(&GraphNodeStart::node, &GraphNodeStart::node)
+);
+
+lua.new_usertype<GraphNodeLevelOfDetail>("GraphNodeLevelOfDetail",
+    "node", sol::property(&GraphNodeLevelOfDetail::node, &GraphNodeLevelOfDetail::node),
+    "minDistance", sol::property(&GraphNodeLevelOfDetail::minDistance, &GraphNodeLevelOfDetail::minDistance),
+    "maxDistance", sol::property(&GraphNodeLevelOfDetail::maxDistance, &GraphNodeLevelOfDetail::maxDistance)
+);
+
+lua.new_usertype<GraphNodeSwitchCase>("GraphNodeSwitchCase",
+    "fnNode", sol::property(&GraphNodeSwitchCase::fnNode, &GraphNodeSwitchCase::fnNode),
+    "unused", sol::property(&GraphNodeSwitchCase::unused, &GraphNodeSwitchCase::unused),
+    "numCases", sol::property(&GraphNodeSwitchCase::numCases, &GraphNodeSwitchCase::numCases),
+    "selectedCase", sol::property(&GraphNodeSwitchCase::selectedCase, &GraphNodeSwitchCase::selectedCase)
+);
+
+lua.new_usertype<GraphNodeCamera>("GraphNodeCamera",
+    "fnNode", sol::property(&GraphNodeCamera::fnNode, &GraphNodeCamera::fnNode),
+    "mode", sol::overload([] (GraphNodeCamera& s) -> s32 { return s.config.mode; }, [] (GraphNodeCamera& s, s32 v) { s.config.mode = v; }),
+    "camera", sol::overload([] (GraphNodeCamera& s) -> struct Camera* { return s.config.camera; }, [] (GraphNodeCamera& s, struct Camera* v) { s.config.camera = v; }),
+    "pos", sol::property(&GraphNodeCamera::pos, &GraphNodeCamera::pos),
+    "focus", sol::property(&GraphNodeCamera::focus, &GraphNodeCamera::focus),
+    "prevPos", sol::property(&GraphNodeCamera::prevPos, &GraphNodeCamera::prevPos),
+    "prevFocus", sol::property(&GraphNodeCamera::prevFocus, &GraphNodeCamera::prevFocus),
+    "prevTimestamp", sol::property(&GraphNodeCamera::prevTimestamp, &GraphNodeCamera::prevTimestamp),
+    "matrixPtr", sol::property(&GraphNodeCamera::matrixPtr, &GraphNodeCamera::matrixPtr),
+    "matrixPtrInterpolated", sol::property(&GraphNodeCamera::matrixPtrInterpolated, &GraphNodeCamera::matrixPtrInterpolated),
+    "roll", sol::property(&GraphNodeCamera::roll, &GraphNodeCamera::roll),
+    "rollScreen", sol::property(&GraphNodeCamera::rollScreen, &GraphNodeCamera::rollScreen)
+);
+
+lua.new_usertype<GraphNodeTranslationRotation>("GraphNodeTranslationRotation",
+    "node", sol::property(&GraphNodeTranslationRotation::node, &GraphNodeTranslationRotation::node),
+    "displayList", sol::property(&GraphNodeTranslationRotation::displayList, &GraphNodeTranslationRotation::displayList),
+    "translation", sol::property(&GraphNodeTranslationRotation::translation, &GraphNodeTranslationRotation::translation),
+    "rotation", sol::property(&GraphNodeTranslationRotation::rotation, &GraphNodeTranslationRotation::rotation)
+);
+
+lua.new_usertype<GraphNodeTranslation>("GraphNodeTranslation",
+    "node", sol::property(&GraphNodeTranslation::node, &GraphNodeTranslation::node),
+    "displayList", sol::property(&GraphNodeTranslation::displayList, &GraphNodeTranslation::displayList),
+    "translation", sol::property(&GraphNodeTranslation::translation, &GraphNodeTranslation::translation),
+    "filler", sol::overload([] (GraphNodeTranslation& s, int i) -> u8 { return s.filler[i]; }, [] (GraphNodeTranslation& s, int i, u8 v) { s.filler[i] = v; })
+);
+
+lua.new_usertype<GraphNodeRotation>("GraphNodeRotation",
+    "node", sol::property(&GraphNodeRotation::node, &GraphNodeRotation::node),
+    "displayList", sol::property(&GraphNodeRotation::displayList, &GraphNodeRotation::displayList),
+    "rotation", sol::property(&GraphNodeRotation::rotation, &GraphNodeRotation::rotation),
+    "prevRotation", sol::property(&GraphNodeRotation::prevRotation, &GraphNodeRotation::prevRotation),
+    "prevTimestamp", sol::property(&GraphNodeRotation::prevTimestamp, &GraphNodeRotation::prevTimestamp)
+);
+
+lua.new_usertype<GraphNodeAnimatedPart>("GraphNodeAnimatedPart",
+    "node", sol::property(&GraphNodeAnimatedPart::node, &GraphNodeAnimatedPart::node),
+    "displayList", sol::property(&GraphNodeAnimatedPart::displayList, &GraphNodeAnimatedPart::displayList),
+    "translation", sol::property(&GraphNodeAnimatedPart::translation, &GraphNodeAnimatedPart::translation)
+);
+
+lua.new_usertype<GraphNodeBillboard>("GraphNodeBillboard",
+    "node", sol::property(&GraphNodeBillboard::node, &GraphNodeBillboard::node),
+    "displayList", sol::property(&GraphNodeBillboard::displayList, &GraphNodeBillboard::displayList),
+    "translation", sol::property(&GraphNodeBillboard::translation, &GraphNodeBillboard::translation)
+);
+
+lua.new_usertype<GraphNodeDisplayList>("GraphNodeDisplayList",
+    "node", sol::property(&GraphNodeDisplayList::node, &GraphNodeDisplayList::node),
+    "displayList", sol::property(&GraphNodeDisplayList::displayList, &GraphNodeDisplayList::displayList)
+);
+
+lua.new_usertype<GraphNodeScale>("GraphNodeScale",
+    "node", sol::property(&GraphNodeScale::node, &GraphNodeScale::node),
+    "displayList", sol::property(&GraphNodeScale::displayList, &GraphNodeScale::displayList),
+    "scale", sol::property(&GraphNodeScale::scale, &GraphNodeScale::scale)
+);
+
+lua.new_usertype<GraphNodeShadow>("GraphNodeShadow",
+    "node", sol::property(&GraphNodeShadow::node, &GraphNodeShadow::node),
+    "shadowScale", sol::property(&GraphNodeShadow::shadowScale, &GraphNodeShadow::shadowScale),
+    "shadowSolidity", sol::property(&GraphNodeShadow::shadowSolidity, &GraphNodeShadow::shadowSolidity),
+    "shadowType", sol::property(&GraphNodeShadow::shadowType, &GraphNodeShadow::shadowType)
+);
+
+lua.new_usertype<GraphNodeObjectParent>("GraphNodeObjectParent",
+    "node", sol::property(&GraphNodeObjectParent::node, &GraphNodeObjectParent::node),
+    "sharedChild", sol::property(&GraphNodeObjectParent::sharedChild, &GraphNodeObjectParent::sharedChild)
+);
+
+lua.new_usertype<GraphNodeGenerated>("GraphNodeGenerated",
+    "fnNode", sol::property(&GraphNodeGenerated::fnNode, &GraphNodeGenerated::fnNode),
+    "parameter", sol::property(&GraphNodeGenerated::parameter, &GraphNodeGenerated::parameter)
+);
+
+lua.new_usertype<GraphNodeBackground>("GraphNodeBackground",
+    "fnNode", sol::property(&GraphNodeBackground::fnNode, &GraphNodeBackground::fnNode),
+    "unused", sol::property(&GraphNodeBackground::unused, &GraphNodeBackground::unused),
+    "background", sol::property(&GraphNodeBackground::background, &GraphNodeBackground::background),
+    "prevCameraPos", sol::property(&GraphNodeBackground::prevCameraPos, &GraphNodeBackground::prevCameraPos),
+    "prevCameraFocus", sol::property(&GraphNodeBackground::prevCameraFocus, &GraphNodeBackground::prevCameraFocus),
+    "prevCameraTimestamp", sol::property(&GraphNodeBackground::prevCameraTimestamp, &GraphNodeBackground::prevCameraTimestamp)
+);
+
+lua.new_usertype<GraphNodeHeldObject>("GraphNodeHeldObject",
+    "fnNode", sol::property(&GraphNodeHeldObject::fnNode, &GraphNodeHeldObject::fnNode),
+    "playerIndex", sol::property(&GraphNodeHeldObject::playerIndex, &GraphNodeHeldObject::playerIndex),
+    "objNode", sol::property(&GraphNodeHeldObject::objNode, &GraphNodeHeldObject::objNode),
+    "translation", sol::property(&GraphNodeHeldObject::translation, &GraphNodeHeldObject::translation),
+    "prevShadowPos", sol::property(&GraphNodeHeldObject::prevShadowPos, &GraphNodeHeldObject::prevShadowPos),
+    "prevShadowPosTimestamp", sol::property(&GraphNodeHeldObject::prevShadowPosTimestamp, &GraphNodeHeldObject::prevShadowPosTimestamp)
+);
+
+lua.new_usertype<GraphNodeCullingRadius>("GraphNodeCullingRadius",
+    "node", sol::property(&GraphNodeCullingRadius::node, &GraphNodeCullingRadius::node),
+    "cullingRadius", sol::property(&GraphNodeCullingRadius::cullingRadius, &GraphNodeCullingRadius::cullingRadius),
+    "filler", sol::overload([] (GraphNodeCullingRadius& s, int i) -> u8 { return s.filler[i]; }, [] (GraphNodeCullingRadius& s, int i, u8 v) { s.filler[i] = v; })
+);
+
+lua.new_usertype<WallCollisionData>("WallCollisionData",
+    "z", sol::property(&WallCollisionData::z, &WallCollisionData::z),
+    "offsetY", sol::property(&WallCollisionData::offsetY, &WallCollisionData::offsetY),
+    "radius", sol::property(&WallCollisionData::radius, &WallCollisionData::radius),
+    "filler", sol::overload([] (WallCollisionData& s, int i) -> u8 { return s.filler[i]; }, [] (WallCollisionData& s, int i, u8 v) { s.filler[i] = v; }),
+    "numWalls", sol::property(&WallCollisionData::numWalls, &WallCollisionData::numWalls),
+    "walls", sol::overload([] (WallCollisionData& s, int i) -> struct Surface* { return s.walls[i]; }, [] (WallCollisionData& s, int i, struct Surface* v) { s.walls[i] = v; })
+);
+
+lua.new_usertype<FloorGeometry>("FloorGeometry",
+    "filler", sol::overload([] (FloorGeometry& s, int i) -> u8 { return s.filler[i]; }, [] (FloorGeometry& s, int i, u8 v) { s.filler[i] = v; }),
+    "normalX", sol::property(&FloorGeometry::normalX, &FloorGeometry::normalX),
+    "normalY", sol::property(&FloorGeometry::normalY, &FloorGeometry::normalY),
+    "normalZ", sol::property(&FloorGeometry::normalZ, &FloorGeometry::normalZ),
+    "originOffset", sol::property(&FloorGeometry::originOffset, &FloorGeometry::originOffset)
+);
+
+lua.new_usertype<SurfaceNode>("SurfaceNode",
+    "next", sol::property(&SurfaceNode::next, &SurfaceNode::next),
+    "surface", sol::property(&SurfaceNode::surface, &SurfaceNode::surface)
+);
+
+lua.new_usertype<IEvent>("IEvent",
+    "cancelled", sol::property(&IEvent::cancelled, &IEvent::cancelled)
+);
+
+lua.new_usertype<EventListener>("EventListener",
+    "priority", sol::property(&EventListener::priority, &EventListener::priority),
+    "function", sol::property(&EventListener::function, &EventListener::function)
+);

@@ -23,7 +23,7 @@ extern struct AudioSessionSettingsEU gAudioSessionPresets[];
 extern struct AudioSessionSettings gAudioSessionPresetsJP[];
 extern struct AudioSessionSettings gAudioSessionPresetsUS[];
 #endif
-extern u16 D_80332388[128]; // unused
+extern u16 D_80332388[128]; // unused // sol:ignore
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 extern f32 gPitchBendFrequencyScale[256];
@@ -71,8 +71,8 @@ extern f32 gVolRampingRhs128[128];
 // non-constant .data
 extern s16 gTatumsPerBeat;
 extern s8 gUnusedCount80333EE8;
-extern s32 gAudioHeapSize; // AUDIO_HEAP_SIZE
-extern s32 gAudioInitPoolSize; // AUDIO_INIT_POOL_SIZE
+extern s32 gAudioHeapSize; // AUDIO_HEAP_SIZE // sol:ignore
+extern s32 gAudioInitPoolSize; // AUDIO_INIT_POOL_SIZE // sol:ignore
 extern volatile s32 gAudioLoadLock;
 
 // .bss

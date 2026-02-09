@@ -22,5 +22,6 @@ enum class ResourceType {
     Trajectory = 0x5452414A,     // TRAJ
     WaterDroplet = 0x57545244,   // WTRD
     AssetArray = 0x41415252,   // AARR
+    Text = 0x54455854,         // TEXT
 };
 } // namespace SOH
