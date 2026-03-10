@@ -21,14 +21,15 @@
 static size_t order = 0;
 static int16_t selectedFile = 0;
 static BossBattleType bossBattleType = BOSS_BATTLE_NONE;
-// std::unordered_map<int16_t, int16_t> racingStars = {
-//     {COURSE_BOB, 1}, // Footrace
-//     {COURSE_CCM, 2}, // Big Penguin
-//     {COURSE_THI, 4}  // Rematch
-// };
-
-
-
+std::unordered_map<int16_t, int16_t> racingStars = {
+    {COURSE_BOB, 1}, // Footrace
+    {COURSE_CCM, 2}, // Big Penguin
+    {COURSE_THI, 2}  // Rematch
+};
+std::unordered_map<int16_t, int16_t> metalCapStars = {
+    {COURSE_JRB, -1},
+    {COURSE_DDD, -1}
+};
 
 std::unordered_map<std::string, AchievementProgress> gAchievementProgress;
 
@@ -172,6 +173,11 @@ void Achievement_ClearProgress() {
         progress = 0;
         achieved = false;
     }
+}
+
+bool Achievement_CheckIfStarObtained(s32 courseNum, u32 starIndex) {
+    auto starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, courseNum - 1);
+    return starFlags & (1 << starIndex);
 }
 
 void Achievement_ProgressByCategory(AchievementCategory category, int32_t amount) {
@@ -350,6 +356,25 @@ void Achievements_Init() {
             if (save_file_get_total_star_count(slot, COURSE_MIN - 1, COURSE_MAX - 1) + 1 >= 120) {
                 Achievement_Progress("Get120Stars");
             }
+
+            u8 starCount = 0;
+
+            //Calculate racing stars obtained
+            for (const auto& [courseNum, courseStar] : racingStars) {
+                if (Achievement_CheckIfStarObtained(courseNum, courseStar) || (gCurrCourseNum == courseNum && starIndex == courseStar)) {
+                    starCount++;
+                }
+            }
+            if (starCount == racingStars.size()) {
+                Achievement_Progress("BeatEveryRace");
+            }
+
+            // TODO: Figure out a temporary storage within the achievement system
+            // for stars that require memory about other stars, such as if a cap was used or not,
+            // if damage was taken, and so on.
+
+
+
         }
 
         if (ev->type == TYPE_COIN) {
@@ -541,7 +566,7 @@ void Achievements_Init() {
             return;
         }
 
-        SPDLOG_INFO("ExecuteAction {:X}", ev->action);
+        // SPDLOG_INFO("ExecuteAction {:X}", ev->action); // This gets really noisy
 
         switch (ev->action) {
             case ACT_BEGIN_SLIDING:
