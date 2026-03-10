@@ -21,6 +21,14 @@
 static size_t order = 0;
 static int16_t selectedFile = 0;
 static BossBattleType bossBattleType = BOSS_BATTLE_NONE;
+// std::unordered_map<int16_t, int16_t> racingStars = {
+//     {COURSE_BOB, 1}, // Footrace
+//     {COURSE_CCM, 2}, // Big Penguin
+//     {COURSE_THI, 4}  // Rematch
+// };
+
+
+
 
 std::unordered_map<std::string, AchievementProgress> gAchievementProgress;
 
@@ -58,9 +66,9 @@ std::unordered_map<std::string, Achievement> gAchievementList = {
     R("ReleaseChainChomp", AchievementCategory::Extras, "Chomp-Chomp!", "Release the Chain Chomp",
       "extras.chain-chomp"),
     R("DefeatKingWhomp", AchievementCategory::Bosses, "Come On And Slam", "Defeat King Whomp", "bosses.king-whomp"),
-    R("Get6MainStars", AchievementCategory::Levels, "F Rank", "Get all 6 Main Stars in One Level", "ranks.f"), //?
+    R("Get6MainStars", AchievementCategory::Levels, "F Rank", "Get all 6 Main Stars in One Level", "ranks.f"),
     R("Get100CoinStar", AchievementCategory::Levels, "E Rank", "Get a 100-Coin Star", "ranks.e",
-      "Get6MainStars"), // to test
+      "Get6MainStars"),
     P("Get8Stars", AchievementCategory::Stars, "You feel a strong power", "Get 8 Stars", "stars.8", 8, "Get1Star"),
     R("DefeatBowser1", AchievementCategory::Bosses, "Bowser Trapped In The Dark", "Defeat Bowser in the Dark World",
       "bosses.bowser-1"),
@@ -81,7 +89,7 @@ std::unordered_map<std::string, Achievement> gAchievementList = {
     R("DefeatWiggler", AchievementCategory::Bosses, "Insecticide", "Defeat Wiggler", "bosses.wiggler"),
     P("Get70Stars", AchievementCategory::Stars, "Halfway There", "Get 70 Stars", "stars.70", 70, "Get50Stars"),
     R("DefeatBowser3", AchievementCategory::Bosses, "Final Showdown", "Defeat Bowser in the Sky", "bosses.bowser-3"),
-    ? R("WatchEnding", AchievementCategory::Extras, "The Cake Is A Lie?!", "Watch the game ending", "extras.cake"),
+    R("WatchEnding", AchievementCategory::Extras, "The Cake Is A Lie?!", "Watch the game ending", "extras.cake"),
     R("BeatEveryRace", AchievementCategory::Extras, "Olympic Runner", "Beat Every Racing Challenge",
       "extras.runner"), //! not implemented
     R("GrabSwimmingStars", AchievementCategory::Extras, "Olympic Swimmer",
@@ -286,10 +294,12 @@ void Achievements_Init() {
             const int16_t slot = gCurrSaveFileNum - 1;
             const uint32_t starFlags = save_file_get_star_flags(slot, gCurrCourseNum - 1);
             const uint32_t starIndex = (ev->object->oBehParams) >> 24 & 0x1F;
-            SPDLOG_INFO("Star Collected: course {}, star index {}, star flags {:08b}", gCurrCourseNum, starIndex,
+            const bool grandStar = (ev->object->oInteractionSubtype & 0x800) != 0;
+            SPDLOG_INFO("Star Collected: course {}, star index {}, currActNum {}, star flags {:08b}", gCurrCourseNum, starIndex, gCurrActNum,
                         starFlags);
+            SPDLOG_INFO("Collected already? {}\nGrand Star? {}", (starFlags & (1 << starIndex)) != 0, grandStar);
 
-            if (!(starFlags & (1 << gCurrActNum))) {
+            if (!(starFlags & (1 << starIndex)) && !grandStar) {
                 Achievement_ProgressByCategory(AchievementCategory::Stars, 1);
             }
 
@@ -333,7 +343,7 @@ void Achievements_Init() {
                 Achievement_Progress("GetAllCourseStars");
             }
 
-            if (save_file_get_course_star_count(slot, COURSE_NONE - 1) + 1 >= 15) {
+            if (save_file_get_total_star_count(slot, COURSE_BONUS_STAGES - 1, COURSE_MAX - 1) + 1 >= 15) {
                 Achievement_Progress("GetAllCastleStars");
             }
 
@@ -343,7 +353,7 @@ void Achievements_Init() {
         }
 
         if (ev->type == TYPE_COIN) {
-            SPDLOG_INFO("Coin Collected: total coins now {}", gMarioState->numCoins);
+            SPDLOG_INFO("Coin Collected: {}", gMarioState->numCoins);
 
             if (gCourseCoinLimits.contains(gCurrCourseNum) &&
                 gMarioState->numCoins + 1 >= gCourseCoinLimits[gCurrCourseNum]) {
@@ -404,7 +414,7 @@ void Achievements_Init() {
                 Achievement_Progress("DefeatBowser2");
                 break;
             case BOSS_TYPE_BOWSER_BITS:
-                if (save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN, COURSE_MAX) >= 120) {
+                if (save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 120) {
                     Achievement_Progress("DefeatBowser3WithAllStars");
                     Achievement_Progress("DefeatBowser3");
                 } else {
