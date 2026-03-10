@@ -22,14 +22,11 @@ static size_t order = 0;
 static int16_t selectedFile = 0;
 static BossBattleType bossBattleType = BOSS_BATTLE_NONE;
 std::unordered_map<int16_t, int16_t> racingStars = {
-    {COURSE_BOB, 1}, // Footrace
-    {COURSE_CCM, 2}, // Big Penguin
-    {COURSE_THI, 2}  // Rematch
+    { COURSE_BOB, 1 }, // Footrace
+    { COURSE_CCM, 2 }, // Big Penguin
+    { COURSE_THI, 2 }  // Rematch
 };
-std::unordered_map<int16_t, int16_t> metalCapStars = {
-    {COURSE_JRB, -1},
-    {COURSE_DDD, -1}
-};
+std::unordered_map<int16_t, int16_t> metalCapStars = { { COURSE_JRB, -1 }, { COURSE_DDD, -1 } };
 
 std::unordered_map<std::string, AchievementProgress> gAchievementProgress;
 
@@ -68,8 +65,7 @@ std::unordered_map<std::string, Achievement> gAchievementList = {
       "extras.chain-chomp"),
     R("DefeatKingWhomp", AchievementCategory::Bosses, "Come On And Slam", "Defeat King Whomp", "bosses.king-whomp"),
     R("Get6MainStars", AchievementCategory::Levels, "F Rank", "Get all 6 Main Stars in One Level", "ranks.f"),
-    R("Get100CoinStar", AchievementCategory::Levels, "E Rank", "Get a 100-Coin Star", "ranks.e",
-      "Get6MainStars"),
+    R("Get100CoinStar", AchievementCategory::Levels, "E Rank", "Get a 100-Coin Star", "ranks.e", "Get6MainStars"),
     P("Get8Stars", AchievementCategory::Stars, "You feel a strong power", "Get 8 Stars", "stars.8", 8, "Get1Star"),
     R("DefeatBowser1", AchievementCategory::Bosses, "Bowser Trapped In The Dark", "Defeat Bowser in the Dark World",
       "bosses.bowser-1"),
@@ -110,7 +106,8 @@ std::unordered_map<std::string, Achievement> gAchievementList = {
     P("Get120Stars", AchievementCategory::Stars, "The Completionist", "Get 120 Stars", "stars.120", 120, "Get70Stars"),
     R("TalkWithYoshi", AchievementCategory::Extras, "Is That You?", "Talk with Yoshi on the Roof", "extras.yoshi"),
     R("DefeatBowser3WithAllStars", AchievementCategory::Bosses, "True Ending",
-      "Defeat Bowser in the Sky with 120 Stars", "bosses.bowser-3-with-120-stars", "The Completionist"), };
+      "Defeat Bowser in the Sky with 120 Stars", "bosses.bowser-3-with-120-stars", "The Completionist"),
+};
 
 std::unordered_map<int16_t, int16_t> gCourseCoinLimits = {
     { COURSE_BOB, 146 }, { COURSE_WF, 141 },  { COURSE_JRB, 104 }, { COURSE_CCM, 154 }, { COURSE_BBH, 151 },
@@ -301,8 +298,8 @@ void Achievements_Init() {
             const uint32_t starFlags = save_file_get_star_flags(slot, gCurrCourseNum - 1);
             const uint32_t starIndex = (ev->object->oBehParams) >> 24 & 0x1F;
             const bool grandStar = (ev->object->oInteractionSubtype & 0x800) != 0;
-            SPDLOG_INFO("Star Collected: course {}, star index {}, currActNum {}, star flags {:08b}", gCurrCourseNum, starIndex, gCurrActNum,
-                        starFlags);
+            SPDLOG_INFO("Star Collected: course {}, star index {}, currActNum {}, star flags {:08b}", gCurrCourseNum,
+                        starIndex, gCurrActNum, starFlags);
             SPDLOG_INFO("Collected already? {}\nGrand Star? {}", (starFlags & (1 << starIndex)) != 0, grandStar);
 
             if (!(starFlags & (1 << starIndex)) && !grandStar) {
@@ -359,9 +356,10 @@ void Achievements_Init() {
 
             u8 starCount = 0;
 
-            //Calculate racing stars obtained
+            // Calculate racing stars obtained
             for (const auto& [courseNum, courseStar] : racingStars) {
-                if (Achievement_CheckIfStarObtained(courseNum, courseStar) || (gCurrCourseNum == courseNum && starIndex == courseStar)) {
+                if (Achievement_CheckIfStarObtained(courseNum, courseStar) ||
+                    (gCurrCourseNum == courseNum && starIndex == courseStar)) {
                     starCount++;
                 }
             }
@@ -372,9 +370,6 @@ void Achievements_Init() {
             // TODO: Figure out a temporary storage within the achievement system
             // for stars that require memory about other stars, such as if a cap was used or not,
             // if damage was taken, and so on.
-
-
-
         }
 
         if (ev->type == TYPE_COIN) {
