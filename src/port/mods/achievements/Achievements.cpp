@@ -26,7 +26,18 @@ std::unordered_map<int16_t, int16_t> racingStars = {
     { COURSE_CCM, 2 }, // Big Penguin
     { COURSE_THI, 2 }  // Rematch
 };
-std::unordered_map<int16_t, int16_t> metalCapStars = { { COURSE_JRB, -1 }, { COURSE_DDD, -1 } };
+// std::multimap<int16_t, int16_t> metalCapStars = {
+//     { COURSE_JRB, 5 }, // Thru Jetstream
+//     { COURSE_DDD, 3 }, // Thru Jetstream
+//     { COURSE_DDD, 5 }  // Collect Caps
+// };
+std::vector<std::pair<int16_t, int16_t>> metalCapStars = {
+    { COURSE_JRB, 5 }, // Thru Jetstream
+    { COURSE_DDD, 3 }, // Thru Jetstream
+    { COURSE_DDD, 5 }  // Collect Caps
+};
+static int gCoinsCollected = 0;
+static int gMetalCapStars = 0;
 
 std::unordered_map<std::string, AchievementProgress> gAchievementProgress;
 
@@ -87,10 +98,9 @@ std::unordered_map<std::string, Achievement> gAchievementList = {
     P("Get70Stars", AchievementCategory::Stars, "Halfway There", "Get 70 Stars", "stars.70", 70, "Get50Stars"),
     R("DefeatBowser3", AchievementCategory::Bosses, "Final Showdown", "Defeat Bowser in the Sky", "bosses.bowser-3"),
     R("WatchEnding", AchievementCategory::Extras, "The Cake Is A Lie?!", "Watch the game ending", "extras.cake"),
-    R("BeatEveryRace", AchievementCategory::Extras, "Olympic Runner", "Beat Every Racing Challenge",
-      "extras.runner"), //! not implemented
+    R("BeatEveryRace", AchievementCategory::Extras, "Olympic Runner", "Beat Every Racing Challenge", "extras.runner"),
     R("GrabSwimmingStars", AchievementCategory::Extras, "Olympic Swimmer",
-      "Grab every star that needs Metal Cap without it", "extras.swimmer"), //! not implemented
+      "Grab every star that needs Metal Cap underwater without it", "extras.swimmer"),
     R("GetAllCoinsOneLevel", AchievementCategory::Levels, "D Rank", "Get all Coins in One Level", "ranks.d",
       "Get100CoinStar"),
     R("GetAllStarsInBasement", AchievementCategory::Levels, "C Rank", "Get all Main Stars in the Basement", "ranks.c",
@@ -255,6 +265,8 @@ void Achievements_Load(IEvent* event) {
             gAchievementProgress[id].progress = progress;
             gAchievementProgress[id].achieved = progress >= gAchievementList[id].maxProgress;
         }
+        gMetalCapStars = saveData->capStars;
+        gCoinsCollected = saveData->coins;
     }
 }
 
@@ -274,6 +286,8 @@ void Achievements_Save(IEvent* event) {
             saveData->entries[index].progress = progress.progress;
             index++;
         }
+        saveData->capStars = gMetalCapStars;
+        saveData->coins = gCoinsCollected;
     }
 }
 
@@ -306,7 +320,7 @@ void Achievements_Init() {
                 Achievement_ProgressByCategory(AchievementCategory::Stars, 1);
             }
 
-            if (gMarioState->numCoins >= 100 and starIndex == 6) {
+            if (ev->marioState->numCoins >= 100 and starIndex == 6) {
                 Achievement_Progress("Get100CoinStar");
             }
 
@@ -320,37 +334,51 @@ void Achievements_Init() {
             // For these, we have to factor in the star that was just collected,
             // since star save flags aren't updated by this point.
             // BOB, WF, JRB, CCM, BBH
-            SPDLOG_INFO("TOTAL STARS:\nFLOOR 1: {}\nBASEMENT: {}\nFLOOR 2: {}\nCOURSE STARS: {}\nCASTLE STARS: {}\nALL "
-                        "STARS: {}",
-                        save_file_get_total_star_count(slot, COURSE_BOB - 1, COURSE_BBH - 1),
-                        save_file_get_total_star_count(slot, COURSE_HMC - 1, COURSE_DDD - 1),
-                        save_file_get_total_star_count(slot, COURSE_SL - 1, COURSE_RR - 1),
-                        save_file_get_total_star_count(slot, COURSE_BOB - 1, COURSE_RR - 1),
-                        save_file_get_course_star_count(slot, COURSE_NONE - 1),
-                        save_file_get_total_star_count(slot, COURSE_MIN - 1, COURSE_MAX - 1));
-            if (save_file_get_total_star_count(slot, COURSE_BOB - 1, COURSE_BBH - 1) + 1 >= 35) {
+            SPDLOG_INFO(
+                "TOTAL STARS:\nFLOOR 1: {}\nBASEMENT: {}\nFLOOR 2: {}\nCOURSE STARS: {}\nCASTLE STARS: {}\nALL "
+                "STARS: {}",
+                save_file_get_total_star_count(slot, COURSE_NUM_TO_INDEX(COURSE_BOB), COURSE_NUM_TO_INDEX(COURSE_BBH)),
+                save_file_get_total_star_count(slot, COURSE_NUM_TO_INDEX(COURSE_HMC), COURSE_NUM_TO_INDEX(COURSE_DDD)),
+                save_file_get_total_star_count(slot, COURSE_NUM_TO_INDEX(COURSE_SL), COURSE_NUM_TO_INDEX(COURSE_RR)),
+                save_file_get_total_star_count(slot, COURSE_NUM_TO_INDEX(COURSE_BOB), COURSE_NUM_TO_INDEX(COURSE_RR)),
+                save_file_get_course_star_count(slot, COURSE_NUM_TO_INDEX(COURSE_NONE)),
+                save_file_get_total_star_count(slot, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)));
+            if (save_file_get_total_star_count(slot, COURSE_NUM_TO_INDEX(COURSE_BOB), COURSE_NUM_TO_INDEX(COURSE_BBH)) +
+                    1 >=
+                35) {
                 Achievement_Progress("GetAllStarsInFloor1");
             }
 
             // HMC, LLL, SSL, DDD
-            if (save_file_get_total_star_count(slot, COURSE_HMC - 1, COURSE_DDD - 1) + 1 >= 28) {
+            if (save_file_get_total_star_count(slot, COURSE_NUM_TO_INDEX(COURSE_HMC), COURSE_NUM_TO_INDEX(COURSE_DDD)) +
+                    1 >=
+                28) {
                 Achievement_Progress("GetAllStarsInBasement");
             }
 
             // SL, WDW, TTM, THI, TTC, RR
-            if (save_file_get_total_star_count(slot, COURSE_SL - 1, COURSE_RR - 1) + 1 >= 42) {
+            if (save_file_get_total_star_count(slot, COURSE_NUM_TO_INDEX(COURSE_SL), COURSE_NUM_TO_INDEX(COURSE_RR)) +
+                    1 >=
+                42) {
                 Achievement_Progress("GetAllStarsInFloor2");
             }
 
-            if (save_file_get_total_star_count(slot, COURSE_BOB - 1, COURSE_RR - 1) + 1 >= 105) {
+            if (save_file_get_total_star_count(slot, COURSE_NUM_TO_INDEX(COURSE_BOB), COURSE_NUM_TO_INDEX(COURSE_RR)) +
+                    1 >=
+                105) {
                 Achievement_Progress("GetAllCourseStars");
             }
 
-            if (save_file_get_total_star_count(slot, COURSE_BONUS_STAGES - 1, COURSE_MAX - 1) + 1 >= 15) {
+            if (save_file_get_total_star_count(slot, COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
+                                               COURSE_NUM_TO_INDEX(COURSE_MAX)) +
+                    1 >=
+                15) {
                 Achievement_Progress("GetAllCastleStars");
             }
 
-            if (save_file_get_total_star_count(slot, COURSE_MIN - 1, COURSE_MAX - 1) + 1 >= 120) {
+            if (save_file_get_total_star_count(slot, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) +
+                    1 >=
+                120) {
                 Achievement_Progress("Get120Stars");
             }
 
@@ -367,16 +395,35 @@ void Achievements_Init() {
                 Achievement_Progress("BeatEveryRace");
             }
 
-            // TODO: Figure out a temporary storage within the achievement system
-            // for stars that require memory about other stars, such as if a cap was used or not,
-            // if damage was taken, and so on.
+            // gMetalCapStars should be checked bitwise, to ensure that we can remember
+            // which stars were done metal-less and assign as necessary.
+            for (int i = 0; i < metalCapStars.size(); i++) {
+                s16 courseNum = metalCapStars[i].first;
+                s16 courseStar = metalCapStars[i].second;
+                // check to see if we don't have it...bitwise
+                if (!(gMetalCapStars & (1 << i))) {
+                    // check if what we just collected was it
+                    if (gCurrCourseNum == courseNum && starIndex == courseStar) {
+                        // check if mario isn't metal
+                        if ((ev->marioState->flags & MARIO_METAL_CAP) == 0) {
+                            gMetalCapStars |= (1 << i);
+                        }
+                    }
+                }
+            }
+
+            // 7 is (1 << (0 + 1 + 2)); therefore, 7 can be used to check for all metal stars.
+            if (gMetalCapStars == 7) {
+                Achievement_Progress("GrabSwimmingStars");
+            }
         }
 
         if (ev->type == TYPE_COIN) {
-            SPDLOG_INFO("Coin Collected: {}", gMarioState->numCoins);
+            SPDLOG_INFO("Coin Collected: {}", ev->marioState->numCoins + 1);
+            gCoinsCollected += ev->object->oDamageOrCoinValue;
 
             if (gCourseCoinLimits.contains(gCurrCourseNum) &&
-                gMarioState->numCoins + 1 >= gCourseCoinLimits[gCurrCourseNum]) {
+                ev->marioState->numCoins + 1 >= gCourseCoinLimits[gCurrCourseNum]) {
                 Achievement_Progress("GetAllCoinsOneLevel");
             }
         }
@@ -547,6 +594,9 @@ void Achievements_Init() {
             case DEATH_TYPE_FIRE:
                 Achievement_Progress("DeathByFire");
                 break;
+            // case DEATH_TYPE_EATEN:
+            //     Achievement_Progress("DeathByBeingEaten");
+            //     break;
             default: {
                 Achievement_Progress("DeathByEnemy");
                 break;
