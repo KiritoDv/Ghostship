@@ -24,8 +24,14 @@
 #ifndef __SWITCH__
 #include "Companion.h"
 
-#if !defined(__IOS__) && !defined(__ANDROID__) && !defined(__SWITCH__)
+#if !defined(__IOS__) && !defined(__ANDROID__) && !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
 #include "portable-file-dialogs.h"
+#endif
+
+#ifdef __EMSCRIPTEN__
+#include "web/WebUtils.h"
+#include <emscripten.h>
+static constexpr const char* kWebPersistPath = "/idbfs";
 #endif
 
 std::unordered_map<std::string, std::string> mGameList = {
@@ -92,9 +98,14 @@ bool GameExtractor::SelectGameFromUI() {
     std::string romPath;
     std::vector<uint8_t> romData;
 
-#if !defined(__IOS__) && !defined(__ANDROID__) && !defined(__SWITCH__)
+#if defined(__EMSCRIPTEN__)
+    romPath = WebFilePicker_PickROM();
+    if (romPath.empty()) {
+        SPDLOG_ERROR("GameExtractor: no ROM file selected in browser file picker.");
+        return false;
+    }
+#elif !defined(__IOS__) && !defined(__ANDROID__) && !defined(__SWITCH__)
     // Desktop: fallback to file dialogue if no baserom found
-    // if (!foundGame) {
     if (!pfd::settings::available()) {
         SPDLOG_ERROR("portable-file-dialogs is not available on this system.");
         return false;
@@ -106,17 +117,14 @@ bool GameExtractor::SelectGameFromUI() {
     }
 
     romPath = selection[0];
-    //}
 #else
     // Mobile: fallback to baserom.us.z64
-    if (/*!foundGame && */ !std::filesystem::exists(Ship::Context::GetPathRelativeToAppDirectory("baserom.us.z64"))) {
+    if (!std::filesystem::exists(Ship::Context::GetPathRelativeToAppDirectory("baserom.us.z64"))) {
         SPDLOG_ERROR("baserom not found");
         return false;
     }
 
-    // if (!foundGame) {
     romPath = Ship::Context::GetPathRelativeToAppDirectory("baserom.us.z64");
-    //}
 #endif
 
     // Load file if it is not already open
@@ -230,6 +238,10 @@ std::string GameExtractor::GetRomPath() {
 }
 
 bool GameExtractor::Parse(std::atomic<size_t>& totalAssets, std::string appShortName) {
+#ifdef __EMSCRIPTEN__
+    WebCache_Mount(kWebPersistPath);
+#endif
+
     const std::string assets_path = Ship::Context::GetAppBundlePath();
     const std::string game_path = Ship::Context::GetAppDirectoryPath(appShortName);
 
@@ -237,10 +249,19 @@ bool GameExtractor::Parse(std::atomic<size_t>& totalAssets, std::string appShort
     Companion::Instance->SetProcess(false);
     try {
         Companion::Instance->Init(ExportType::Binary, totalAssets);
+#ifdef __EMSCRIPTEN__
+        Companion::Instance->Process(totalAssets);
+#endif
     } catch (const std::exception& e) {
         SPDLOG_INFO("Failed to process O2R {}", e.what());
         return false;
     }
+
+#ifdef __EMSCRIPTEN__
+    SPDLOG_INFO("GameExtractor: persisting O2R to IndexedDB…");
+    WebCache_Save();
+    SPDLOG_INFO("GameExtractor: IndexedDB sync complete.");
+#endif
 
     return true;
 }

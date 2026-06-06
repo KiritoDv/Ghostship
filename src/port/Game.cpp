@@ -3,6 +3,13 @@
 #include <fast/interpreter.h>
 #include "Engine.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <emscripten/emscripten.h>
+#include "web/WebUtils.h"
+static constexpr const char* kWebPersistPath = "/idbfs";
+#endif
+
 extern "C" {
 #include "audio/external.h"
 #include "game/game_init.h"
@@ -31,14 +38,26 @@ int SDL_main(int argc, char** argv) {
 #else
 int main(int argc, char* argv[]) {
 #endif
+
+#ifdef __EMSCRIPTEN__
+    WebCache_Mount(kWebPersistPath);
+    WebCache_Load();
+#endif
+
     GameEngine::Create(argc, argv);
     alloc_pool();
     audio_init();
     sound_init();
     thread5_game_loop();
+
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(push_frame, 0, 1);
+#else
     while (WindowIsRunning()) {
         push_frame();
     }
     GameEngine::Instance->Destroy();
+#endif
+
     return 0;
 }

@@ -71,6 +71,11 @@ set(CMAKE_C_STANDARD 11 CACHE STRING "The C standard to use")
 # add_compile_options(-fsanitize=address)
 # add_link_options(-fsanitize=address)
 
+if(EMSCRIPTEN)
+    add_compile_options(-pthread)
+    add_link_options(-pthread)
+endif()
+
 # Add a custom module path to locate additional CMake modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 set(YAML_CPP_STATIC_DEFINE ON)
@@ -259,6 +264,8 @@ file(GLOB_RECURSE ALL_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     "src/port/mods/mirror/*.cpp"
     "src/port/net/*.h"
     "src/port/net/*.cpp"
+    "src/port/web/*.h"
+    "src/port/web/*.cpp"
     "text/*.c"
     "textures/*.h"
     "textures/*.c"
@@ -375,6 +382,7 @@ else()
     )
     FetchContent_MakeAvailable(tinyxml2)
 endif()
+
 add_subdirectory(libultraship ${CMAKE_CURRENT_SOURCE_DIR}/libultraship)
 add_dependencies(${PROJECT_NAME} libultraship)
 if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
@@ -493,7 +501,7 @@ else()
  	set(ADDITIONAL_LIBRARY_DEPENDENCIES)
 endif()
 
-if(USE_NETWORKING AND NOT CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch" AND NOT CMAKE_SYSTEM_NAME STREQUAL "CafeOS")
+if(USE_NETWORKING AND NOT CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch" AND NOT CMAKE_SYSTEM_NAME STREQUAL "CafeOS" AND NOT EMSCRIPTEN)
     FetchContent_Declare(
         ixwebsocket
         GIT_REPOSITORY https://github.com/machinezone/IXWebSocket.git
@@ -537,6 +545,96 @@ list(APPEND ADDITIONAL_LIBRARY_DEPENDENCIES torch)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
+################################################################################
+# Emscripten / WebAssembly target
+################################################################################
+if(EMSCRIPTEN)
+    # No scripting (TCC is a native JIT, not portable to WASM).
+    set(ENABLE_SCRIPTING OFF CACHE BOOL "" FORCE)
+
+    # Tell the game to use OpenGL ES 3.0 (→ WebGL 2).
+    target_compile_definitions(${PROJECT_NAME} PRIVATE USE_OPENGLES=1)
+
+    # Output as a JS+WASM bundle rather than a native executable.
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        SUFFIX ".html"
+        OUTPUT_NAME "ghostship"
+    )
+
+    # Locate the HTML shell template we ship alongside the game source.
+    set(WEB_SHELL "${CMAKE_SOURCE_DIR}/src/port/web/shell.html")
+
+    target_link_options(${PROJECT_NAME} PRIVATE
+        # Debug info: embed DWARF + emit a source map so the browser devtools
+        # resolve wasm offsets to C/C++ file:line.  Remove for release builds.
+        -g
+        -gsource-map
+        "--source-map-base=http://localhost:8080/"
+
+        # Window / GL backend — use SDL2 and WebGL 2 provided by the Emscripten SDK.
+        -sUSE_SDL=2
+        -sUSE_WEBGL2=1
+        -sMAX_WEBGL_VERSION=2
+        -sMIN_WEBGL_VERSION=2
+        -sFULL_ES3=1
+
+        # Memory — start at 256 MB and allow growth for large games.
+        -sINITIAL_MEMORY=268435456   # 256 MiB
+        -sALLOW_MEMORY_GROWTH=1
+        -sEXIT_RUNTIME=1
+        -sSTACK_SIZE=5242880         # 5 MiB stack for deep call chains
+        -sPTHREAD_POOL_SIZE=4
+
+        # ASYNCIFY lets C code yield while waiting for async browser APIs
+        # (file picker, IndexedDB sync).
+        -sASYNCIFY=1
+        -sASSERTIONS=1
+        -sASYNCIFY_STACK_SIZE=8388608
+
+        # Filesystem — expose FS API to JS and enable persistent IndexedDB FS.
+        -sFORCE_FILESYSTEM=1
+        -lidbfs.js
+
+        # Exports needed by the web shell and JS glue.
+        "-sEXPORTED_FUNCTIONS=_main,_malloc,_free"
+        "-sEXPORTED_RUNTIME_METHODS=FS,ccall,cwrap,UTF8ToString,stringToUTF8"
+
+        # HTML shell.
+        --shell-file ${WEB_SHELL}
+
+        # Embed the Torch YAML assets and config into the WASM virtual FS so
+        # Companion can find them.  GetAppBundlePath() returns "." on web, so
+        # Companion looks for ./config.yml and ./assets/ymls/... (i.e. at the
+        # root of the virtual FS).
+        "--preload-file=${CMAKE_SOURCE_DIR}/assets@/assets"
+        "--preload-file=${CMAKE_SOURCE_DIR}/config.yml@/config.yml"
+        "--preload-file=${CMAKE_SOURCE_DIR}/ghostship.o2r@/ghostship.o2r"
+
+        # Produce a .wasm alongside the .js.
+        -sWASM=1
+
+        # Use Emscripten's default JS-based exception handling so that all
+        # third-party object files (libultraship, FetchContent deps) are
+        # ABI-compatible without needing -fwasm-exceptions in every TU.
+        -fexceptions
+    )
+
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        -sUSE_SDL=2
+        -fexceptions
+        -g
+    )
+
+    # Copy the COI service worker alongside the HTML output so the browser can
+    # register it for SharedArrayBuffer / pthreads support on any host.
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/src/port/web/coi-serviceworker.js"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/coi-serviceworker.js"
+        COMMENT "Copying coi-serviceworker.js to build output"
+    )
+endif()
+
 ################################################################################
 # Compile and link options
 ################################################################################
@@ -666,6 +764,25 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
               -Wno-stringop-overflow
           >
       )
+  elseif(EMSCRIPTEN)
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        -Wall -Wextra -Wno-error
+        -Wno-unused-parameter
+        -Wno-unused-function
+        -Wno-unused-variable
+        -Wno-missing-field-initializers
+        -Wno-parentheses
+        -Wno-narrowing
+        -Wno-missing-braces
+        -Wno-int-conversion
+        $<$<COMPILE_LANGUAGE:C>:
+            -Werror-implicit-function-declaration
+            -Wno-incompatible-pointer-types
+            -fpermissive
+        >
+        $<$<COMPILE_LANGUAGE:CXX>:-fpermissive>
+        $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-enum-enum-conversion>
+    )
   else()
       if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
         set(CPU_OPTION -msse2 -mfpmath=sse)

@@ -17,6 +17,7 @@ public:
     void SetSearchPath(const std::string& path);
     void GetRoms(std::vector<std::string>& roms);
     std::string GetRomPath();
+    const std::vector<uint8_t>& GetGameData() const { return mGameData; }
     bool Parse(std::atomic<size_t>& assetCount, std::string appShortName = "");
     bool GenerateOTR(std::string appShortName = "");
     bool GenerateOTR(std::atomic<size_t>& assetCount, std::string appShortName = "");

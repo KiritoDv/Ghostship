@@ -163,12 +163,17 @@ GameEngine::GameEngine() : dictionary(nullptr) {
     portArchiveVersionMatch = std::filesystem::exists(assets_path);
 
     auto controlDeck = std::make_shared<LUS::ControlDeck>();
+#ifdef __EMSCRIPTEN__
+    auto threadCount = 1;
+#else
+    auto threadCount = std::max(1u, std::thread::hardware_concurrency() - 1);
+#endif
 
     this->context->InitControlDeck(controlDeck);
     this->context->InitResourceManager({ assets_path }, {}, 3);
     this->context->InitConsole();
 
-#ifndef __SWITCH__
+#if !defined(__SWITCH__) && defined(ENABLE_SCRIPTING)
     this->context->GetResourceManager()->GetArchiveManager()->SetUntrustedArchiveHandler(
         [](Ship::Archive& archive, Ship::KeystoreEntry& key) {
             const auto info = archive.GetManifest();
@@ -294,7 +299,7 @@ void CheckAndCreateModFolder() {
 }
 
 static void SetupScriptLoader(std::shared_ptr<Ship::Context> context) {
-#ifdef __SWITCH__
+#if defined(__SWITCH__) || !defined(ENABLE_SCRIPTING)
     return;
 #else
     constexpr int codeVersion = 1;
@@ -513,7 +518,7 @@ void GameEngine::FinishInit() {
     DevConsole_Init();
     PortEnhancements_Init();
     ShipInit::InitAll();
-#ifndef __SWITCH__
+#if !defined(__SWITCH__) && defined(ENABLE_SCRIPTING)
     context->GetScriptLoader()->LoadAll();
 #endif
     CALL_EVENT(EngineReady);
@@ -584,7 +589,14 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
         std::filesystem::remove("sm64.o2r");
     }
 #endif
+#ifdef __EMSCRIPTEN__
+    auto runTask = [](auto&& fn) { std::forward<decltype(fn)>(fn)(); };
+    auto resetPool = []() {};
+#else
     std::shared_ptr<BS::thread_pool> threadPool = std::make_shared<BS::thread_pool>(1);
+    auto runTask = [&](auto&& fn) { threadPool->submit_task(std::forward<decltype(fn)>(fn)); };
+    auto resetPool = [&]() { threadPool = nullptr; };
+#endif
     while (true) {
 #ifdef USE_NETWORKING
         auto satellaPhase = Satella::Client::Instance().GetPhase();
@@ -649,7 +661,7 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
                                 "Ghostship Path Error",
                                 "Ghostship is running in a temp folder.\nExtract the .zip and run again.", "OK", "",
                                 [&]() {
-                                    threadPool = nullptr;
+                                    resetPool();
                                     gsFast3dWindow = nullptr;
                                     context = nullptr;
                                     exit(0);
@@ -675,7 +687,7 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
                                 "OK", "", [&]() {
                                     fclose(tfile);
                                     PathTestCleanup(tfile);
-                                    threadPool = nullptr;
+                                    resetPool();
                                     gsFast3dWindow = nullptr;
                                     context = nullptr;
                                     exit(0);
@@ -688,7 +700,7 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
                                     "Ghostship does not have proper file permissions.\nPlease move it to a "
                                     "folder that does and run again.",
                                     "OK", "", [&]() {
-                                        threadPool = nullptr;
+                                        resetPool();
                                         gsFast3dWindow = nullptr;
                                         context = nullptr;
                                         exit(0);
@@ -706,7 +718,7 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
                                 "Please move it to a folder outside of OneDrive, like the root of a\n"
                                 "drive (e.g. \"C:\\Games\\Ghostship\").",
                                 "OK", "", [&]() {
-                                    threadPool = nullptr;
+                                    resetPool();
                                     gsFast3dWindow = nullptr;
                                     context = nullptr;
                                     exit(0);
@@ -740,7 +752,7 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
                             }
                         },
                         [&]() {
-                            threadPool = nullptr;
+                            resetPool();
                             gsFast3dWindow = nullptr;
                             context = nullptr;
                             exit(0);
@@ -757,7 +769,7 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
                         std::string msg = "Archive for current ROM, " + archive + ", already exists.\nExtract again?";
                         GhostshipGui::RegisterPopup("Confirm Re-extract", msg.c_str(), "Yes", "No", [&]() {
                             extracting = true;
-                            threadPool->submit_task([&]() -> void {
+                            runTask([&]() -> void {
                                 extract.Parse(totalExtract, "sm64");
                                 extract.GenerateOTR(extractCount, "sm64");
                                 extracting = false;
@@ -766,7 +778,7 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
                         });
                     } else {
                         extracting = true;
-                        threadPool->submit_task([&]() -> void {
+                        runTask([&]() -> void {
                             extract.Parse(totalExtract, "sm64");
                             extract.GenerateOTR(extractCount, "sm64");
                             extracting = false;
@@ -787,30 +799,38 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
 #if !defined(__SWITCH__) && !defined(__WIIU__)
                 switch (promptStep) {
                     case PS_FILE_CHECK: {
-                        const bool romO2RExists =
-                            std::filesystem::exists(Ship::Context::LocateFileAcrossAppDirs("sm64.o2r", "sm64"));
+                        const auto o2rPath = Ship::Context::LocateFileAcrossAppDirs("sm64.o2r", "sm64");
+                        const bool romO2RExists = std::filesystem::exists(o2rPath);
+                        SPDLOG_INFO("[Extract] PS_FILE_CHECK: o2rPath='{}' exists={}", o2rPath, romO2RExists);
 
                         if (!romO2RExists) {
                             GhostshipGui::RegisterPopup(
                                 "No O2R Files", "No O2R files found. Generate one now?", "Yes", "No",
-                                [&]() { promptStep = PS_LOCAL; },
                                 [&]() {
-                                    threadPool = nullptr;
+                                    SPDLOG_INFO("[Extract] PS_FILE_CHECK -> PS_LOCAL");
+                                    promptStep = PS_LOCAL;
+                                },
+                                [&]() {
+                                    resetPool();
                                     gsFast3dWindow = nullptr;
                                     context = nullptr;
                                     exit(0);
                                 });
                         } else {
+                            SPDLOG_INFO("[Extract] PS_FILE_CHECK -> ES_VERIFY (o2r found)");
                             extractStep = ES_VERIFY;
                         }
                         continue;
                     }
                     case PS_LOCAL: {
+                        SPDLOG_INFO("[Extract] PS_LOCAL: installPath='{}' appDir='{}'", installPath,
+                                    Ship::Context::GetAppDirectoryPath("sm64"));
                         extract = GameExtractor();
                         extract.SetSearchPath(installPath);
                         extract.GetRoms(args);
                         extract.SetSearchPath(Ship::Context::GetAppDirectoryPath("sm64"));
                         extract.GetRoms(args);
+                        SPDLOG_INFO("[Extract] PS_LOCAL: found {} ROM(s) in local dirs", args.size());
                         if (!args.empty()) {
                             promptStep = PS_WAIT;
                             GhostshipGui::RegisterPopup(
@@ -821,20 +841,31 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
                                     promptStep = PS_FIRST;
                                 });
                         } else {
+                            SPDLOG_INFO("[Extract] PS_LOCAL -> PS_FIRST");
                             promptStep = PS_FIRST;
                         }
                         continue;
                     }
                     case PS_FIRST: {
+                        SPDLOG_INFO("[Extract] PS_FIRST: args={} calling SelectGameFromUI", args.size());
                         if (args.empty() && !extract.SelectGameFromUI()) {
+                            SPDLOG_INFO("[Extract] PS_FIRST: SelectGameFromUI failed/cancelled -> PS_FILE_CHECK");
                             promptStep = PS_FILE_CHECK;
                             continue;
                         }
+                        SPDLOG_INFO("[Extract] PS_FIRST: ROM selected path='{}' dataSize={}", extract.GetRomPath(),
+                                    extract.GetGameData().size());
                         extracting = true;
                         file = extract.GetRomPath();
-                        threadPool->submit_task([&]() -> void {
-                            extract.Parse(totalExtract, "sm64");
-                            extract.GenerateOTR(extractCount, "sm64");
+                        runTask([&]() -> void {
+                            SPDLOG_INFO("[Extract] runTask: calling Parse, dataSize={}", extract.GetGameData().size());
+                            bool parseOk = extract.Parse(totalExtract, "sm64");
+                            SPDLOG_INFO("[Extract] runTask: Parse returned {}", parseOk);
+                            bool genOk = extract.GenerateOTR(extractCount, "sm64");
+                            SPDLOG_INFO("[Extract] runTask: GenerateOTR returned {}", genOk);
+                            const auto o2rOut = Ship::Context::LocateFileAcrossAppDirs("sm64.o2r", "sm64");
+                            SPDLOG_INFO("[Extract] runTask: sm64.o2r exists={} at '{}'",
+                                        std::filesystem::exists(o2rOut), o2rOut);
                             extracting = false;
                             extractStep = ES_VERIFY;
                             extractCount = 0;
@@ -858,7 +889,7 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
                     GhostshipGui::RegisterPopup("No ROM Archive",
                                                 "No ROM O2R file detected. Please generate a ROM O2R and relaunch.",
                                                 "OK", "", [&]() {
-                                                    threadPool = nullptr;
+                                                    resetPool();
                                                     gsFast3dWindow = nullptr;
                                                     context = nullptr;
                                                     exit(0);
@@ -871,7 +902,7 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
             case GS_COMPILE: {
 #ifdef USE_NETWORKING
                 if (CVarGetInteger(CVAR_DEVELOPER_TOOLS("Satella"), 1) == 1) {
-                    threadPool->submit_task([&]() -> void {
+                    runTask([&]() -> void {
                         Satella::Client::Instance().Execute();
                         extractStep = GS_LOAD;
                     });
@@ -889,8 +920,8 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
                 break;
             case GS_LOAD: {
                 LoadResourceFiles();
-                threadPool->submit_task([&]() -> void {
-#ifndef __SWITCH__
+                runTask([&]() -> void {
+#if !defined(__SWITCH__) && defined(ENABLE_SCRIPTING)
                     auto scripting = Ship::Context::GetInstance()->GetScriptLoader();
                     auto pre = [&](const std::shared_ptr<Ship::Archive>& archive) {
                         auto& info = archive->GetManifest();
@@ -911,7 +942,7 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
 
     render:
         if (!WindowIsRunning()) {
-            threadPool = nullptr;
+            resetPool();
             gsFast3dWindow = nullptr;
             context = nullptr;
             exit(0);
@@ -1018,7 +1049,7 @@ void GameEngine::RunExtract(int argc, char* argv[]) {
         gsFast3dWindow->EndFrame();
         ImGui::PopStyleColor(2);
     }
-    threadPool = nullptr;
+    resetPool();
 
 #if defined(__WIIU__)
     Ship::WiiU::Init(appShortName);
@@ -1082,7 +1113,7 @@ void GameEngine::ScaleImGui() {
 }
 
 void GameEngine::LoadScripts() {
-#ifndef __SWITCH__
+#if !defined(__SWITCH__) && defined(ENABLE_SCRIPTING)
     auto scripting = Ship::Context::GetInstance()->GetScriptLoader();
     Notification::Emit(
         { .message = "Loading mods this may take a while...", .remainingTime = (totalScripts * 5.0f), .mute = true });
@@ -1122,13 +1153,17 @@ void GameEngine::LoadScripts() {
                              .remainingTime = 5.0f,
                              .mute = true });
     }
-#endif // __SWITCH__
+#endif // !__SWITCH__ && ENABLE_SCRIPTING
 }
 
 void GameEngine::Create(int argc, char* argv[]) {
-    const auto instance = Instance = new GameEngine();
-    instance->RunExtract(argc, argv);
-    instance->FinishInit();
+    // Only construct — do NOT call RunExtract/FinishInit here.
+    // On Emscripten, RunExtract calls EM_ASYNC_JS (file picker, IDBFS).
+    // ASYNCIFY=1 saves the call stack and rewinds it; if the constructor is
+    // in the same call frame as RunExtract, the rewind re-enters the
+    // constructor, orphaning the first Context and crashing in its destructor.
+    // Game.cpp calls RunExtract and FinishInit explicitly after Create().
+    Instance = new GameEngine();
 }
 
 void GameEngine::Destroy() {
@@ -1223,7 +1258,6 @@ void GameEngine::StartAudioFrame() {
         std::unique_lock<std::mutex> Lock(audio.mutex);
         audio.processing = true;
     }
-
     audio.cv_to_thread.notify_one();
 }
 
@@ -1281,8 +1315,6 @@ void GameEngine::AudioExit() {
         audio.running = false;
     }
     audio.cv_to_thread.notify_all();
-
-    // Wait until the audio thread quit
     audio.thread.join();
 }
 

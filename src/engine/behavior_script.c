@@ -989,7 +989,7 @@ void cur_obj_update(void) {
     }
 
     // Handle visibility of object
-    CALL_CANCELLABLE_EVENT(ModifyObjectVisibility, &gCurrentObject) {
+    CALL_CANCELLABLE_EVENT(ModifyObjectVisibility, gCurrentObject) {
         if (gCurrentObject->oRoom != -1) {
             // If the object is in a room, only show it when Mario is in the room.
             cur_obj_enable_rendering_if_mario_in_room();
